@@ -1,9 +1,11 @@
-package info.deez.deezbgg;
+package info.deez.deezbgg.ui.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import info.deez.deezbgg.R;
 
 
 public class MainActivity extends Activity {
