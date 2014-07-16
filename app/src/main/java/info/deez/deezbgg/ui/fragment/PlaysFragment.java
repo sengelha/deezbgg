@@ -20,40 +20,40 @@ import android.widget.ListView;
 import android.widget.TextView;
 import info.deez.deezbgg.R;
 import info.deez.deezbgg.entity.BoardGame;
-import info.deez.deezbgg.entity.CollectionItem;
+import info.deez.deezbgg.entity.Play;
 import info.deez.deezbgg.repository.BoardGameRepository;
-import info.deez.deezbgg.repository.CollectionItemRepository;
+import info.deez.deezbgg.repository.PlayRepository;
 
-public class CollectionFragment extends ListFragment {
-    class CollectionFragmentRowData {
-        public CollectionItem collectionItem;
+public class PlaysFragment extends ListFragment {
+    class PlaysFragmentRowData {
+        public Play play;
         public BoardGame boardGame;
     }
 
-    class CollectionFragmentAdapter extends BaseAdapter {
-        private static final String TAG = "CollectionFragmentAdapter";
+    class PlaysFragmentAdapter extends BaseAdapter {
+        private static final String TAG = "PlaysFragmentAdapter";
         private Context mContext;
 
-        public CollectionFragmentAdapter(Context context) {
+        public PlaysFragmentAdapter(Context context) {
             mContext = context;
         }
 
         @Override
         public int getCount() {
-            return CollectionItemRepository.getAllCollectionItems().size();
+            return PlayRepository.getAllPlays().size();
         }
 
         @Override
-        public CollectionFragmentRowData getItem(int position) {
-            CollectionFragmentRowData rowData = new CollectionFragmentRowData();
-            rowData.collectionItem = CollectionItemRepository.getAllCollectionItems().get(position);
-            rowData.boardGame = BoardGameRepository.getBoardGameById(rowData.collectionItem.boardGameId);
+        public PlaysFragmentRowData getItem(int position) {
+            PlaysFragmentRowData rowData = new PlaysFragmentRowData();
+            rowData.play = PlayRepository.getAllPlays().get(position);
+            rowData.boardGame = BoardGameRepository.getBoardGameById(rowData.play.boardGameId);
             return rowData;
         }
 
         @Override
         public long getItemId(int position) {
-            return CollectionItemRepository.getAllCollectionItems().get(position).id;
+            return PlayRepository.getAllPlays().get(position).id;
         }
 
         @Override
@@ -61,9 +61,9 @@ public class CollectionFragment extends ListFragment {
             View v = convertView;
             if (v == null) {
                 LayoutInflater vi = LayoutInflater.from(mContext);
-                v = vi.inflate(R.layout.fragment_collection, parent, false);
+                v = vi.inflate(R.layout.fragment_plays, parent, false);
             }
-            CollectionFragmentRowData rowData = getItem(position);
+            PlaysFragmentRowData rowData = getItem(position);
             if (rowData != null) {
                 if (rowData.boardGame != null && rowData.boardGame.thumbnailUrl != null) {
                     ImageView iv = (ImageView) v.findViewById(R.id.flag);
@@ -87,6 +87,13 @@ public class CollectionFragment extends ListFragment {
                         tvTitle.setText(rowData.boardGame.name);
                     }
                 }
+
+                if (rowData.play != null && rowData.play.date != null) {
+                    TextView tvTitle = (TextView) v.findViewById(R.id.playDate);
+                    if (tvTitle != null) {
+                        tvTitle.setText(rowData.play.date);
+                    }
+                }
             }
             return v;
         }
@@ -99,7 +106,7 @@ public class CollectionFragment extends ListFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        setListAdapter(new CollectionFragmentAdapter(getActivity()));
+        setListAdapter(new PlaysFragmentAdapter(getActivity()));
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 

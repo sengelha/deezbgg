@@ -7,6 +7,6 @@ import java.util.Date;
  */
 public class Play {
     public int id;
-    public Date date;
-    public BoardGame boardGame;
+    public String date;
+    public long boardGameId;
 }

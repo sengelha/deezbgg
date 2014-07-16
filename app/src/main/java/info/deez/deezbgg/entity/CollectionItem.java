@@ -5,5 +5,5 @@ package info.deez.deezbgg.entity;
  */
 public class CollectionItem {
     public long id;
-    public BoardGame boardGame;
+    public long boardGameId;
 }
