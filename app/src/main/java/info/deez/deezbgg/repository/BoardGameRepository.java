@@ -46,6 +46,36 @@ public class BoardGameRepository {
         mansionsOfMadness.imageUrl = "http://cf.geekdo-images.com/images/pic814011.jpg";
         mansionsOfMadness.thumbnailUrl = "http://cf.geekdo-images.com/images/pic814011_t.jpg";
         boardGames.add(mansionsOfMadness);
+        BoardGame miceAndMystics = new BoardGame();
+        miceAndMystics.id = 124708;
+        miceAndMystics.name = "Mice and Mystics";
+        miceAndMystics.imageUrl = "http://cf.geekdo-images.com/images/pic1312072.jpg";
+        miceAndMystics.thumbnailUrl = "http://cf.geekdo-images.com/images/pic1312072_t.jpg";
+        boardGames.add(miceAndMystics);
+        BoardGame mrJackPocket = new BoardGame();
+        mrJackPocket.id = 72287;
+        mrJackPocket.name = "Mr. Jack Pocket";
+        mrJackPocket.imageUrl = "http://cf.geekdo-images.com/images/pic1519530.jpg";
+        mrJackPocket.thumbnailUrl = "http://cf.geekdo-images.com/images/pic1519530_t.jpg";
+        boardGames.add(mrJackPocket);
+        BoardGame quantum = new BoardGame();
+        quantum.id = 143519;
+        quantum.name = "Quantum";
+        quantum.imageUrl = "http://cf.geekdo-images.com/images/pic1727619.jpg";
+        quantum.thumbnailUrl = "http://cf.geekdo-images.com/images/pic1727619_t.jpg";
+        boardGames.add(quantum);
+        BoardGame phase10 = new BoardGame();
+        phase10.id = 1258;
+        phase10.name = "Phase 10";
+        phase10.imageUrl = "http://cf.geekdo-images.com/images/pic226562.jpg";
+        phase10.thumbnailUrl = "http://cf.geekdo-images.com/images/pic226562_t.jpg";
+        boardGames.add(phase10);
+        BoardGame pillarsOfTheEarth = new BoardGame();
+        pillarsOfTheEarth.id = 24480;
+        pillarsOfTheEarth.name = "The Pillars of the Earth";
+        pillarsOfTheEarth.imageUrl = "http://cf.geekdo-images.com/images/pic212815.jpg";
+        pillarsOfTheEarth.thumbnailUrl = "http://cf.geekdo-images.com/images/pic212815_t.jpg";
+        boardGames.add(pillarsOfTheEarth);
         return boardGames;
     }
 
