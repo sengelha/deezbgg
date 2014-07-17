@@ -49,6 +49,8 @@ class PlaysFragmentAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Log.i(TAG, "In getView for position " + position);
+
         View v = convertView;
         if (v == null) {
             LayoutInflater vi = LayoutInflater.from(mContext);

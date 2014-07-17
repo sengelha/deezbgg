@@ -45,6 +45,8 @@ public class CollectionFragment extends ListFragment implements LoaderManager.Lo
         } else {
             setListShownNoAnimation(true);
         }
+
+        // TODO: Start background sync?
     }
 
     @Override
