@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -66,6 +68,13 @@ class PlaysLoader extends AsyncTaskLoader<List<PlaysFragmentRowData>> {
             row.boardGameBitmap = boardGameBitmaps.get(row.play.boardGameId);
             rows.add(row);
         }
+
+        Collections.sort(rows, new Comparator<PlaysFragmentRowData>() {
+            @Override
+            public int compare(PlaysFragmentRowData lhs, PlaysFragmentRowData rhs) {
+                return -lhs.play.date.compareTo(rhs.play.date);
+            }
+        });
 
         Log.i(TAG, "Finished load in background.  Loaded " + rows.size() + " rows");
         return rows;

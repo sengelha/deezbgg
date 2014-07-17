@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -33,7 +35,6 @@ class CollectionLoader extends AsyncTaskLoader<List<CollectionFragmentRowData>> 
     public List<CollectionFragmentRowData> loadInBackground() {
         Log.i(TAG, "Starting load in background");
         List<CollectionItem> collectionItems = CollectionItemRepository.getAllCollectionItems();
-
         Set<Long> boardGameIds = new HashSet<Long>();
         for (CollectionItem collectionItem : collectionItems) {
             boardGameIds.add(collectionItem.boardGameId);
@@ -65,6 +66,13 @@ class CollectionLoader extends AsyncTaskLoader<List<CollectionFragmentRowData>> 
             row.boardGameBitmap = boardGameBitmaps.get(row.collectionItem.boardGameId);
             rows.add(row);
         }
+
+        Collections.sort(rows, new Comparator<CollectionFragmentRowData>() {
+            @Override
+            public int compare(CollectionFragmentRowData lhs, CollectionFragmentRowData rhs) {
+                return lhs.boardGame.name.compareTo(rhs.boardGame.name);
+            }
+        });
 
         Log.i(TAG, "Finished load in background.  Loaded " + rows.size() + " rows");
         return rows;
