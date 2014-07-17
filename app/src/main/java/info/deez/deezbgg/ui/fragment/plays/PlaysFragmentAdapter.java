@@ -62,14 +62,14 @@ class PlaysFragmentAdapter extends BaseAdapter {
         PlaysFragmentRowData rowData = getItem(position);
         if (rowData != null) {
             if (rowData.boardGameBitmap != null) {
-                ImageView iv = (ImageView) v.findViewById(R.id.flag);
+                ImageView iv = (ImageView) v.findViewById(R.id.boardGameThumbnail);
                 if (iv != null) {
                     iv.setImageBitmap(rowData.boardGameBitmap);
                 }
             }
 
             if (rowData.boardGame != null && rowData.boardGame.name != null) {
-                TextView tvTitle = (TextView) v.findViewById(R.id.txt);
+                TextView tvTitle = (TextView) v.findViewById(R.id.boardGameName);
                 if (tvTitle != null) {
                     tvTitle.setText(rowData.boardGame.name);
                 }

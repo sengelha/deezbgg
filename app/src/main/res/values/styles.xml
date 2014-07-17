@@ -1,8 +1,27 @@
 <resources>
-
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light">
     </style>
 
+    <style name="ImageList">
+        <item name="android:layout_marginRight">@dimen/padding_standard</item>
+        <item name="android:scaleType">centerCrop</item>
+    </style>
+
+    <style name="Text" parent="@android:style/TextAppearance">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Text.Big" parent="@android:style/TextAppearance">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Text.Primary" parent="Text.Big">
+        <item name="android:textStyle">bold</item>
+        <item name="android:lineSpacingMultiplier">0.9</item>
+    </style>
+
+    <style name="Text.Secondary" parent="Text">
+        <item name="android:textColor">@color/light_text</item>
+        <item name="android:textSize">12sp</item>
+    </style>
 </resources>

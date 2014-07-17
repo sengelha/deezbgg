@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">deezbgg</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="thumbnail">Thumbnail</string>
     <string name="action_settings">Settings</string>
 
 </resources>

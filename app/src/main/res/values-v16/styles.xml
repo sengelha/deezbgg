@@ -1,0 +1,6 @@
+<resources>
+    <style name="Text.Primary" parent="Text.Big">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>
