@@ -1,6 +1,9 @@
 package info.deez.deezbgg.repository;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 import info.deez.deezbgg.entity.BoardGame;
 
@@ -87,4 +90,13 @@ public class BoardGameRepository {
         return null;
     }
 
+    public static Dictionary<Long, BoardGame> getBoardGamesByIds(Collection<Long> ids) {
+        Dictionary<Long, BoardGame> dict = new Hashtable<Long, BoardGame>();
+        for (BoardGame boardGame : getAllBoardGames()) {
+            if (ids.contains(boardGame.id)) {
+                dict.put(boardGame.id, boardGame);
+            }
+        }
+        return dict;
+    }
 }
