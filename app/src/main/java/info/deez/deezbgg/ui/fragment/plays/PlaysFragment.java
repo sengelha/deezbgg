@@ -21,7 +21,7 @@ public class PlaysFragment extends ListFragment implements LoaderManager.LoaderC
 
         mAdapter = new PlaysFragmentAdapter(getActivity());
         setListAdapter(mAdapter);
-
+        setListShown(false);
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -40,6 +40,11 @@ public class PlaysFragment extends ListFragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<List<PlaysFragmentRowData>> l, List<PlaysFragmentRowData> data) {
         Log.i(TAG, "Load finished.  Swapping play data...");
         mAdapter.swapPlayData(data);
+        if (isResumed()) {
+            setListShown(true);
+        } else {
+            setListShownNoAnimation(true);
+        }
     }
 
     @Override

@@ -21,7 +21,7 @@ public class CollectionFragment extends ListFragment implements LoaderManager.Lo
 
         mAdapter = new CollectionFragmentAdapter(getActivity());
         setListAdapter(mAdapter);
-
+        setListShown(false);
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -40,6 +40,11 @@ public class CollectionFragment extends ListFragment implements LoaderManager.Lo
     public void onLoadFinished(Loader<List<CollectionFragmentRowData>> l, List<CollectionFragmentRowData> data) {
         Log.i(TAG, "Load finished.  Swapping collection data...");
         mAdapter.swapCollectionData(data);
+        if (isResumed()) {
+            setListShown(true);
+        } else {
+            setListShownNoAnimation(true);
+        }
     }
 
     @Override
