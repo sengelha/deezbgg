@@ -1,9 +1,6 @@
 package info.deez.deezbgg.ui.fragment.plays;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.StrictMode;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +9,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import info.deez.deezbgg.R;
@@ -57,7 +52,7 @@ class PlaysFragmentAdapter extends BaseAdapter {
         View v = convertView;
         if (v == null) {
             LayoutInflater vi = LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.fragment_plays, parent, false);
+            v = vi.inflate(R.layout.row_plays, parent, false);
         }
         PlaysFragmentRowData rowData = getItem(position);
         if (rowData != null) {

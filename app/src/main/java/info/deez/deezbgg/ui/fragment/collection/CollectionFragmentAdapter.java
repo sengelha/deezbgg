@@ -52,7 +52,7 @@ class CollectionFragmentAdapter extends BaseAdapter {
         View v = convertView;
         if (v == null) {
             LayoutInflater vi = LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.fragment_collection, parent, false);
+            v = vi.inflate(R.layout.row_collection, parent, false);
         }
         CollectionFragmentRowData rowData = getItem(position);
         if (rowData != null) {
