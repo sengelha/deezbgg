@@ -10,18 +10,13 @@ import info.deez.deezbgg.entity.CollectionItem;
 public class CollectionItemRepository {
     public static List<CollectionItem> getAllCollectionItems() {
         List<CollectionItem> collectionItems = new ArrayList<CollectionItem>();
-        CollectionItem collectionItem1 = new CollectionItem();
-        collectionItem1.id = 1;
-        collectionItem1.boardGameId = 1;
-        collectionItems.add(collectionItem1);
-        CollectionItem collectionItem2 = new CollectionItem();
-        collectionItem2.id = 2;
-        collectionItem2.boardGameId = 2;
-        collectionItems.add(collectionItem2);
-        CollectionItem collectionItem3 = new CollectionItem();
-        collectionItem3.id = 3;
-        collectionItem3.boardGameId = 3;
-        collectionItems.add(collectionItem3);
+        int id = 1;
+        for (int boardGameId : new int[] { 31260, 2453, 822, 129622, 40692, 83330, 124708, 1258 }) {
+            CollectionItem collectionItem = new CollectionItem();
+            collectionItem.id = id++;
+            collectionItem.boardGameId = boardGameId;
+            collectionItems.add(collectionItem);
+        }
         return collectionItems;
     }
 }
