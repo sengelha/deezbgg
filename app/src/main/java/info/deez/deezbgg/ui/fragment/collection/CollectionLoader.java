@@ -23,6 +23,7 @@ import info.deez.deezbgg.entity.CollectionItem;
 import info.deez.deezbgg.loader.BaseLoader;
 import info.deez.deezbgg.repository.BoardGameRepository;
 import info.deez.deezbgg.repository.CollectionItemRepository;
+import info.deez.deezbgg.repository.DeezbggDbHelper;
 
 /**
  * Asynchronously loads the collection stored in local storage.
@@ -33,20 +34,24 @@ import info.deez.deezbgg.repository.CollectionItemRepository;
  */
 class CollectionLoader extends BaseLoader<List<CollectionFragmentRowData>> {
     private static final String TAG = "CollectionLoader";
+    private CollectionItemRepository mCollectionItemRepository;
+    private BoardGameRepository mBoardGameRepository;
 
-    public CollectionLoader(Context context) {
+    public CollectionLoader(Context context, DeezbggDbHelper dbHelper) {
         super(context);
+        mCollectionItemRepository = new CollectionItemRepository(dbHelper);
+        mBoardGameRepository = new BoardGameRepository(dbHelper);
     }
 
     @Override
     public List<CollectionFragmentRowData> loadInBackground() {
         Log.i(TAG, "Starting load in background");
-        List<CollectionItem> collectionItems = CollectionItemRepository.getAllCollectionItems();
+        List<CollectionItem> collectionItems = mCollectionItemRepository.getAllCollectionItems();
         Set<Long> boardGameIds = new HashSet<Long>();
         for (CollectionItem collectionItem : collectionItems) {
             boardGameIds.add(collectionItem.boardGameId);
         }
-        Dictionary<Long, BoardGame> boardGames = BoardGameRepository.getBoardGamesByIds(boardGameIds);
+        Dictionary<Long, BoardGame> boardGames = mBoardGameRepository.getBoardGamesByIds(boardGameIds);
 
         List<CollectionFragmentRowData> rows = new ArrayList<CollectionFragmentRowData>(collectionItems.size());
         for (CollectionItem collectionItem : collectionItems) {
@@ -59,7 +64,16 @@ class CollectionLoader extends BaseLoader<List<CollectionFragmentRowData>> {
         Collections.sort(rows, new Comparator<CollectionFragmentRowData>() {
             @Override
             public int compare(CollectionFragmentRowData lhs, CollectionFragmentRowData rhs) {
-                return lhs.boardGame.name.compareTo(rhs.boardGame.name);
+                String leftName = (lhs != null && lhs.boardGame != null ? lhs.boardGame.name : null);
+                String rightName = (rhs != null && rhs.boardGame != null ? rhs.boardGame.name : null);
+                if (leftName == null && rightName == null)
+                    return 0;
+                else if (leftName == null)
+                    return 1;
+                else if (rightName == null)
+                    return -1;
+                else
+                    return leftName.compareTo(rightName);
             }
         });
 

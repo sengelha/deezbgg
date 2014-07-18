@@ -1,20 +1,36 @@
 package info.deez.deezbgg.repository;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
 import java.util.List;
 import java.util.ArrayList;
 import info.deez.deezbgg.entity.CollectionItem;
+import info.deez.deezbgg.entity.Play;
 
-/**
- * Created by sengelha on 7/15/2014.
- */
 public class CollectionItemRepository {
-    public static List<CollectionItem> getAllCollectionItems() {
+    private DeezbggDbHelper mDbHelper;
+
+    public CollectionItemRepository(DeezbggDbHelper dbHelper) {
+        mDbHelper = dbHelper;
+    }
+
+    public List<CollectionItem> getAllCollectionItems() {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        String[] projection = {
+                DeezbggContract.CollectionItemEntry._ID,
+                DeezbggContract.CollectionItemEntry.COLUMN_NAME_COLLECTION_ITEM_ID,
+                DeezbggContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_ID
+        };
+
+        Cursor c = db.query(DeezbggContract.CollectionItemEntry.TABLE_NAME, projection, null, null, null, null, null);
+
         List<CollectionItem> collectionItems = new ArrayList<CollectionItem>();
-        int id = 1;
-        for (int boardGameId : new int[] { 31260, 2453, 822, 129622, 40692, 83330, 124708, 1258 }) {
+        while (c.moveToNext()) {
             CollectionItem collectionItem = new CollectionItem();
-            collectionItem.id = id++;
-            collectionItem.boardGameId = boardGameId;
+            collectionItem.id = c.getLong(c.getColumnIndex(DeezbggContract.CollectionItemEntry.COLUMN_NAME_COLLECTION_ITEM_ID));
+            collectionItem.boardGameId = c.getLong(c.getColumnIndex(DeezbggContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_ID));
             collectionItems.add(collectionItem);
         }
         return collectionItems;

@@ -22,25 +22,30 @@ import info.deez.deezbgg.entity.BoardGame;
 import info.deez.deezbgg.entity.Play;
 import info.deez.deezbgg.loader.BaseLoader;
 import info.deez.deezbgg.repository.BoardGameRepository;
+import info.deez.deezbgg.repository.DeezbggDbHelper;
 import info.deez.deezbgg.repository.PlayRepository;
 
 class PlaysLoader extends BaseLoader<List<PlaysFragmentRowData>> {
     private static final String TAG = "PlaysLoader";
+    private BoardGameRepository mBoardGameRepository;
+    private PlayRepository mPlayRepository;
 
-    public PlaysLoader(Context context) {
+    public PlaysLoader(Context context, DeezbggDbHelper dbHelper) {
         super(context);
+        mBoardGameRepository = new BoardGameRepository(dbHelper);
+        mPlayRepository = new PlayRepository(dbHelper);
     }
 
     @Override
     public List<PlaysFragmentRowData> loadInBackground() {
         Log.i(TAG, "Starting load in background");
-        List<Play> plays = PlayRepository.getAllPlays();
+        List<Play> plays = mPlayRepository.getAllPlays();
 
         Set<Long> boardGameIds = new HashSet<Long>();
         for (Play play : plays) {
             boardGameIds.add(play.boardGameId);
         }
-        Dictionary<Long, BoardGame> boardGames = BoardGameRepository.getBoardGamesByIds(boardGameIds);
+        Dictionary<Long, BoardGame> boardGames = mBoardGameRepository.getBoardGamesByIds(boardGameIds);
 
         List<PlaysFragmentRowData> rows = new ArrayList<PlaysFragmentRowData>(plays.size());
         for (Play play : plays) {

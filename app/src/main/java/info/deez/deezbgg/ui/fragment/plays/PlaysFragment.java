@@ -11,15 +11,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import info.deez.deezbgg.repository.DeezbggDbHelper;
+
 public class PlaysFragment extends ListFragment implements LoaderManager.LoaderCallbacks<List<PlaysFragmentRowData>> {
     private static final String TAG = "PlaysFragment";
+    private DeezbggDbHelper mDbHelper;
     private PlaysFragmentAdapter mAdapter;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        mDbHelper = new DeezbggDbHelper(getActivity());
         mAdapter = new PlaysFragmentAdapter(getActivity());
+
+        setEmptyText("No plays found");
         setListAdapter(mAdapter);
         setListShown(false);
         getLoaderManager().initLoader(0, null, this);
@@ -33,7 +39,7 @@ public class PlaysFragment extends ListFragment implements LoaderManager.LoaderC
     @Override
     public Loader<List<PlaysFragmentRowData>> onCreateLoader(int id, Bundle args) {
         Log.i(TAG, "Creating loader");
-        return new PlaysLoader(getActivity());
+        return new PlaysLoader(getActivity(), mDbHelper);
     }
 
     @Override
