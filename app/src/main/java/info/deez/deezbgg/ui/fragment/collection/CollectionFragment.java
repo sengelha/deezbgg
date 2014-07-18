@@ -56,7 +56,8 @@ public class CollectionFragment extends ListFragment implements LoaderManager.Lo
             setListShownNoAnimation(true);
         }
 
-        mSyncManager.syncCollectionAsync("sengelha", mDbHelper, mAdapter);
+        //mSyncManager.syncCollectionAsync("sengelha", mDbHelper, mAdapter);
+        mSyncManager.syncCollectionAsync("aldie", mDbHelper, mAdapter);
     }
 
     @Override

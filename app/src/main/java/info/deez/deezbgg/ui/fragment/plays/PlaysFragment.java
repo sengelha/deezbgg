@@ -55,7 +55,8 @@ public class PlaysFragment extends ListFragment implements LoaderManager.LoaderC
             setListShownNoAnimation(true);
         }
 
-        mSyncManager.syncPlaysAsync("sengelha", mDbHelper, mAdapter);
+        //mSyncManager.syncPlaysAsync("sengelha", mDbHelper, mAdapter);
+        mSyncManager.syncPlaysAsync("aldie", mDbHelper, mAdapter);
     }
 
     @Override

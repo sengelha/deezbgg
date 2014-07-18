@@ -37,6 +37,7 @@ public class CollectionSyncTask extends AsyncTask<String, Void, List<CollectionF
     @Override
     protected List<CollectionFragmentRowData> doInBackground(String... params) {
         try {
+            Log.i(TAG, "Starting sync of collection...");
             String username = params[0];
             URL url = new URL("http://boardgamegeek.com/xmlapi2/collection?username=" + username);
             URLConnection conn = url.openConnection();
@@ -53,15 +54,14 @@ public class CollectionSyncTask extends AsyncTask<String, Void, List<CollectionF
             // Put data in database
             CollectionItemRepository collectionItemRepository = new CollectionItemRepository(mDbHelper);
             BoardGameRepository boardGameRepository = new BoardGameRepository(mDbHelper);
-            collectionItemRepository.deleteAllCollectionItems();
-            boardGameRepository.deleteAllBoardGames();
             for (Pair<CollectionItem, BoardGame> result : results) {
-                collectionItemRepository.addCollectionItem(result.first);
-                boardGameRepository.addBoardGame(result.second);
+                collectionItemRepository.upsertCollectionItem(result.first);
+                boardGameRepository.upsertBoardGame(result.second);
             }
 
             // Get new UI-ready data
             CollectionFragmentDataGetter dataGetter = new CollectionFragmentDataGetter(mDbHelper);
+            Log.i(TAG, "Finished sync of collection.");
             return dataGetter.getData();
         }
         catch (Exception e) {

@@ -21,20 +21,23 @@ public class PlayRepository {
     }
 
     public void addPlay(Play play) {
-        Log.i(TAG, "Adding play id=" + play.id);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        addPlayHelper(db, play);
+    }
 
+    public void addPlays(Collection<Play> plays) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        for (Play play : plays) {
+            addPlayHelper(db, play);
+        }
+    }
+
+    private void addPlayHelper(SQLiteDatabase db, Play play) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DeezbggContract.PlayEntry.COLUMN_NAME_PLAY_ID, play.id);
         contentValues.put(DeezbggContract.PlayEntry.COLUMN_NAME_PLAY_DATE, play.date);
         contentValues.put(DeezbggContract.PlayEntry.COLUMN_NAME_BOARD_GAME_ID, play.boardGameId);
         db.insert(DeezbggContract.PlayEntry.TABLE_NAME, null, contentValues);
-    }
-
-    public void addPlays(Collection<Play> plays) {
-        for (Play play : plays) {
-            addPlay(play);
-        }
     }
 
     public void deleteAllPlays() {

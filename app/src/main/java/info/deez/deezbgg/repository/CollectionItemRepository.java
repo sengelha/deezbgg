@@ -8,6 +8,8 @@ import android.util.Log;
 import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
+
+import info.deez.deezbgg.entity.BoardGame;
 import info.deez.deezbgg.entity.CollectionItem;
 import info.deez.deezbgg.entity.Play;
 
@@ -61,5 +63,39 @@ public class CollectionItemRepository {
             collectionItems.add(collectionItem);
         }
         return collectionItems;
+    }
+
+    public CollectionItem getCollectionItemById(long id) {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        String[] projection = {
+                DeezbggContract.CollectionItemEntry._ID,
+                DeezbggContract.CollectionItemEntry.COLUMN_NAME_COLLECTION_ITEM_ID,
+                DeezbggContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_ID
+        };
+
+        Cursor c = db.query
+            (
+            DeezbggContract.CollectionItemEntry.TABLE_NAME,
+            projection,
+            DeezbggContract.CollectionItemEntry.COLUMN_NAME_COLLECTION_ITEM_ID + "=?",
+            new String[] { Long.toString(id) },
+            null,
+            null,
+            null
+            );
+
+        if (!c.moveToNext())
+            return null;
+
+        CollectionItem collectionItem = new CollectionItem();
+        collectionItem.id = c.getLong(c.getColumnIndex(DeezbggContract.CollectionItemEntry.COLUMN_NAME_COLLECTION_ITEM_ID));
+        collectionItem.boardGameId = c.getLong(c.getColumnIndex(DeezbggContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_ID));
+        return collectionItem;
+    }
+
+    public void upsertCollectionItem(CollectionItem collectionItem) {
+        if (getCollectionItemById(collectionItem.id) == null)
+            addCollectionItem(collectionItem);
     }
 }

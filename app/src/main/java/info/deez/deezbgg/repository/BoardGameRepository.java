@@ -24,21 +24,24 @@ public class BoardGameRepository {
     }
 
     public void addBoardGame(BoardGame boardGame) {
-        Log.i(TAG, "Adding board game id=" + boardGame.id + " name=" + boardGame.name);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        addBoardGameHelper(db, boardGame);
+    }
 
+    public void addBoardGames(Collection<BoardGame> boardGames) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        for (BoardGame boardGame : boardGames) {
+            addBoardGameHelper(db, boardGame);
+        }
+    }
+
+    private void addBoardGameHelper(SQLiteDatabase db, BoardGame boardGame) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DeezbggContract.BoardGameEntry.COLUMN_NAME_BOARD_GAME_ID, boardGame.id);
         contentValues.put(DeezbggContract.BoardGameEntry.COLUMN_NAME_NAME, boardGame.name);
         if (boardGame.thumbnailUrl != null)
             contentValues.put(DeezbggContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL, boardGame.thumbnailUrl.toString());
         db.insert(DeezbggContract.BoardGameEntry.TABLE_NAME, null, contentValues);
-    }
-
-    public void addBoardGames(Collection<BoardGame> boardGames) {
-        for (BoardGame boardGame : boardGames) {
-            addBoardGame(boardGame);
-        }
     }
 
     public void deleteAllBoardGames() {
@@ -64,10 +67,13 @@ public class BoardGameRepository {
             BoardGame boardGame = new BoardGame();
             boardGame.id = c.getLong(c.getColumnIndex(DeezbggContract.BoardGameEntry.COLUMN_NAME_BOARD_GAME_ID));
             boardGame.name = c.getString(c.getColumnIndex(DeezbggContract.BoardGameEntry.COLUMN_NAME_NAME));
-            try {
-                boardGame.thumbnailUrl = new URL(c.getString(c.getColumnIndex(DeezbggContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL)));
-            } catch (MalformedURLException e) {
-                Log.e(TAG, "Error parsing URL", e);
+            String urlString = c.getString(c.getColumnIndex(DeezbggContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL));
+            if (urlString != null) {
+                try {
+                    boardGame.thumbnailUrl = new URL(urlString);
+                } catch (MalformedURLException e) {
+                    Log.e(TAG, "Error parsing URL", e);
+                }
             }
             boardGames.add(boardGame);
         }
