@@ -14,7 +14,7 @@ import java.util.List;
 import info.deez.deezbgg.R;
 import info.deez.deezbgg.bitmap.BitmapUtils;
 
-class PlaysFragmentAdapter extends BaseAdapter {
+public class PlaysFragmentAdapter extends BaseAdapter {
     private static final String TAG = "PlaysFragmentAdapter";
     private List<PlaysFragmentRowData> mPlays;
     private Context mContext;

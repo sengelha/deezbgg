@@ -24,45 +24,19 @@ import info.deez.deezbgg.loader.BaseLoader;
 import info.deez.deezbgg.repository.BoardGameRepository;
 import info.deez.deezbgg.repository.DeezbggDbHelper;
 import info.deez.deezbgg.repository.PlayRepository;
+import info.deez.deezbgg.ui.fragment.collection.CollectionFragmentDataGetter;
 
 class PlaysLoader extends BaseLoader<List<PlaysFragmentRowData>> {
     private static final String TAG = "PlaysLoader";
-    private BoardGameRepository mBoardGameRepository;
-    private PlayRepository mPlayRepository;
+    private PlaysFragmentDataGetter mDataGetter;
 
     public PlaysLoader(Context context, DeezbggDbHelper dbHelper) {
         super(context);
-        mBoardGameRepository = new BoardGameRepository(dbHelper);
-        mPlayRepository = new PlayRepository(dbHelper);
+        mDataGetter = new PlaysFragmentDataGetter(dbHelper);
     }
 
     @Override
     public List<PlaysFragmentRowData> loadInBackground() {
-        Log.i(TAG, "Starting load in background");
-        List<Play> plays = mPlayRepository.getAllPlays();
-
-        Set<Long> boardGameIds = new HashSet<Long>();
-        for (Play play : plays) {
-            boardGameIds.add(play.boardGameId);
-        }
-        Dictionary<Long, BoardGame> boardGames = mBoardGameRepository.getBoardGamesByIds(boardGameIds);
-
-        List<PlaysFragmentRowData> rows = new ArrayList<PlaysFragmentRowData>(plays.size());
-        for (Play play : plays) {
-            PlaysFragmentRowData row = new PlaysFragmentRowData();
-            row.play = play;
-            row.boardGame = boardGames.get(row.play.boardGameId);
-            rows.add(row);
-        }
-
-        Collections.sort(rows, new Comparator<PlaysFragmentRowData>() {
-            @Override
-            public int compare(PlaysFragmentRowData lhs, PlaysFragmentRowData rhs) {
-                return -lhs.play.date.compareTo(rhs.play.date);
-            }
-        });
-
-        Log.i(TAG, "Finished load in background.  Loaded " + rows.size() + " rows");
-        return rows;
+        return mDataGetter.getData();
     }
 }

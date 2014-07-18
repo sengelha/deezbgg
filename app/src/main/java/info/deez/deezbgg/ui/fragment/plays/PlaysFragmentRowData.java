@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import info.deez.deezbgg.entity.BoardGame;
 import info.deez.deezbgg.entity.Play;
 
-class PlaysFragmentRowData {
+public class PlaysFragmentRowData {
     public Play play;
     public BoardGame boardGame;
 }

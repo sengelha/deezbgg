@@ -12,11 +12,13 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import info.deez.deezbgg.repository.DeezbggDbHelper;
+import info.deez.deezbgg.sync.SyncManager;
 
 public class PlaysFragment extends ListFragment implements LoaderManager.LoaderCallbacks<List<PlaysFragmentRowData>> {
     private static final String TAG = "PlaysFragment";
     private DeezbggDbHelper mDbHelper;
     private PlaysFragmentAdapter mAdapter;
+    private SyncManager mSyncManager;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -24,6 +26,7 @@ public class PlaysFragment extends ListFragment implements LoaderManager.LoaderC
 
         mDbHelper = new DeezbggDbHelper(getActivity());
         mAdapter = new PlaysFragmentAdapter(getActivity());
+        mSyncManager = new SyncManager(getActivity());
 
         setEmptyText("No plays found");
         setListAdapter(mAdapter);
@@ -51,6 +54,8 @@ public class PlaysFragment extends ListFragment implements LoaderManager.LoaderC
         } else {
             setListShownNoAnimation(true);
         }
+
+        mSyncManager.syncPlaysAsync("sengelha", mDbHelper, mAdapter);
     }
 
     @Override

@@ -1,8 +1,11 @@
 package info.deez.deezbgg.repository;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -10,10 +13,33 @@ import info.deez.deezbgg.entity.BoardGame;
 import info.deez.deezbgg.entity.Play;
 
 public class PlayRepository {
+    private static final String TAG = "PlayRepository";
     private DeezbggDbHelper mDbHelper;
 
     public PlayRepository(DeezbggDbHelper dbHelper) {
         mDbHelper = dbHelper;
+    }
+
+    public void addPlay(Play play) {
+        Log.i(TAG, "Adding play id=" + play.id);
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DeezbggContract.PlayEntry.COLUMN_NAME_PLAY_ID, play.id);
+        contentValues.put(DeezbggContract.PlayEntry.COLUMN_NAME_PLAY_DATE, play.date);
+        contentValues.put(DeezbggContract.PlayEntry.COLUMN_NAME_BOARD_GAME_ID, play.boardGameId);
+        db.insert(DeezbggContract.PlayEntry.TABLE_NAME, null, contentValues);
+    }
+
+    public void addPlays(Collection<Play> plays) {
+        for (Play play : plays) {
+            addPlay(play);
+        }
+    }
+
+    public void deleteAllPlays() {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        db.delete(DeezbggContract.PlayEntry.TABLE_NAME, null, null);
     }
 
     public List<Play> getAllPlays() {

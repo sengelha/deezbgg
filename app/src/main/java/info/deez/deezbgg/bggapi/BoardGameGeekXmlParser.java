@@ -15,22 +15,32 @@ import java.util.List;
 
 import info.deez.deezbgg.entity.BoardGame;
 import info.deez.deezbgg.entity.CollectionItem;
+import info.deez.deezbgg.entity.Play;
 
 public class BoardGameGeekXmlParser {
     private static final String TAG = "BoardGameGeekXmlParser";
     // We don't use namespaces
     private static final String ns = null;
 
-    public List<Pair<CollectionItem, BoardGame>> parse(InputStream stream) throws XmlPullParserException, IOException {
-        Log.i(TAG, "Parsing BGG XML feed...");
+    public List<Pair<CollectionItem, BoardGame>> parseCollection(InputStream stream) throws XmlPullParserException, IOException {
+        Log.i(TAG, "Parsing BGG collection XML feed...");
         XmlPullParser parser = Xml.newPullParser();
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
         parser.setInput(stream, null);
         parser.nextTag();
-        return readFeed(parser);
+        return readCollectionFeed(parser);
     }
 
-    private List<Pair<CollectionItem, BoardGame>> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
+    public List<Pair<Play, BoardGame>> parsePlays(InputStream stream) throws XmlPullParserException, IOException {
+        Log.i(TAG, "Parsing BGG plays XML feed...");
+        XmlPullParser parser = Xml.newPullParser();
+        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+        parser.setInput(stream, null);
+        parser.nextTag();
+        return readPlayFeed(parser);
+    }
+
+    private List<Pair<CollectionItem, BoardGame>> readCollectionFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
         List<Pair<CollectionItem, BoardGame>> entries = new ArrayList<Pair<CollectionItem, BoardGame>>();
 
         parser.require(XmlPullParser.START_TAG, ns, "items");
@@ -40,7 +50,7 @@ public class BoardGameGeekXmlParser {
             }
             String name = parser.getName();
             if (name.equals("item")) {
-                entries.add(readEntry(parser));
+                entries.add(readCollectionEntry(parser));
             } else {
                 skip(parser);
             }
@@ -48,7 +58,25 @@ public class BoardGameGeekXmlParser {
         return entries;
     }
 
-    private Pair<CollectionItem, BoardGame> readEntry(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private List<Pair<Play, BoardGame>> readPlayFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
+        List<Pair<Play, BoardGame>> entries = new ArrayList<Pair<Play, BoardGame>>();
+
+        parser.require(XmlPullParser.START_TAG, ns, "plays");
+        while (parser.next() != XmlPullParser.END_TAG) {
+            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                continue;
+            }
+            String name = parser.getName();
+            if (name.equals("play")) {
+                entries.add(readPlayEntry(parser));
+            } else {
+                skip(parser);
+            }
+        }
+        return entries;
+    }
+
+    private Pair<CollectionItem, BoardGame> readCollectionEntry(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, "item");
 
         CollectionItem collectionItem = new CollectionItem();
@@ -72,6 +100,41 @@ public class BoardGameGeekXmlParser {
         }
         parser.require(XmlPullParser.END_TAG, ns, "item");
         return Pair.create(collectionItem, boardGame);
+    }
+
+    private Pair<Play, BoardGame> readPlayEntry(XmlPullParser parser) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, "play");
+
+        Play play = new Play();
+        play.id = Long.parseLong(parser.getAttributeValue(null, "id"));
+        play.date = parser.getAttributeValue(null, "date");
+        BoardGame boardGame = null;
+
+        while (parser.next() != XmlPullParser.END_TAG) {
+            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                continue;
+            }
+            String name = parser.getName();
+            if (name.equals("item")) {
+                boardGame = readBoardGame(parser);
+            } else {
+                skip(parser);
+            }
+        }
+        play.boardGameId = boardGame.id;
+
+        parser.require(XmlPullParser.END_TAG, ns, "play");
+        return Pair.create(play, boardGame);
+    }
+
+    private BoardGame readBoardGame(XmlPullParser parser) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, "item");
+        BoardGame boardGame = new BoardGame();
+        boardGame.name = parser.getAttributeValue(null, "name");
+        boardGame.id = Long.parseLong(parser.getAttributeValue(null, "objectid"));
+        skip(parser);
+        parser.require(XmlPullParser.END_TAG, ns, "item");
+        return boardGame;
     }
 
     private String readName(XmlPullParser parser) throws XmlPullParserException, IOException {

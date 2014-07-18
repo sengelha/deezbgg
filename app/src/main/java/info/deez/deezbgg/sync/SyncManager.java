@@ -9,6 +9,7 @@ import info.deez.deezbgg.repository.DeezbggDbHelper;
 import info.deez.deezbgg.ui.fragment.collection.CollectionFragment;
 import info.deez.deezbgg.ui.fragment.collection.CollectionFragmentAdapter;
 import info.deez.deezbgg.ui.fragment.collection.CollectionLoader;
+import info.deez.deezbgg.ui.fragment.plays.PlaysFragmentAdapter;
 
 public class SyncManager {
     private static final String TAG = "SyncManager";
@@ -22,5 +23,11 @@ public class SyncManager {
         Log.i(TAG, "Starting sync of collection in background...");
         CollectionSyncTask collectionSyncTask = new CollectionSyncTask(dbHelper, adapter);
         collectionSyncTask.execute(username);
+    }
+
+    public void syncPlaysAsync(String username, DeezbggDbHelper dbHelper, PlaysFragmentAdapter adapter) {
+        Log.i(TAG, "Starting sync of plays in background...");
+        PlaySyncTask playSyncTask = new PlaySyncTask(dbHelper, adapter);
+        playSyncTask.execute(username);
     }
 }

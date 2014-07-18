@@ -30,7 +30,8 @@ public class BoardGameRepository {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DeezbggContract.BoardGameEntry.COLUMN_NAME_BOARD_GAME_ID, boardGame.id);
         contentValues.put(DeezbggContract.BoardGameEntry.COLUMN_NAME_NAME, boardGame.name);
-        contentValues.put(DeezbggContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL, boardGame.thumbnailUrl.toString());
+        if (boardGame.thumbnailUrl != null)
+            contentValues.put(DeezbggContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL, boardGame.thumbnailUrl.toString());
         db.insert(DeezbggContract.BoardGameEntry.TABLE_NAME, null, contentValues);
     }
 
@@ -89,5 +90,10 @@ public class BoardGameRepository {
             }
         }
         return dict;
+    }
+
+    public void upsertBoardGame(BoardGame boardGame) {
+        if (getBoardGameById(boardGame.id) == null)
+            addBoardGame(boardGame);
     }
 }
