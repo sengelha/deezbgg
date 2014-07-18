@@ -6,7 +6,7 @@ import info.deez.deezbgg.entity.BoardGame;
 import info.deez.deezbgg.entity.CollectionItem;
 import info.deez.deezbgg.entity.Play;
 
-class CollectionFragmentRowData {
+public class CollectionFragmentRowData {
     public CollectionItem collectionItem;
     public BoardGame boardGame;
 }

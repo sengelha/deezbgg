@@ -12,11 +12,14 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import info.deez.deezbgg.repository.DeezbggDbHelper;
+import info.deez.deezbgg.sync.CollectionSyncTask;
+import info.deez.deezbgg.sync.SyncManager;
 
 public class CollectionFragment extends ListFragment implements LoaderManager.LoaderCallbacks<List<CollectionFragmentRowData>> {
     private static final String TAG = "CollectionFragment";
     private DeezbggDbHelper mDbHelper;
     private CollectionFragmentAdapter mAdapter;
+    private SyncManager mSyncManager;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -24,6 +27,7 @@ public class CollectionFragment extends ListFragment implements LoaderManager.Lo
 
         mDbHelper = new DeezbggDbHelper(getActivity());
         mAdapter = new CollectionFragmentAdapter(getActivity());
+        mSyncManager = new SyncManager(getActivity());
 
         setEmptyText("No collection items found");
         setListAdapter(mAdapter);
@@ -52,7 +56,7 @@ public class CollectionFragment extends ListFragment implements LoaderManager.Lo
             setListShownNoAnimation(true);
         }
 
-        // TODO: Start background sync?
+        mSyncManager.syncCollectionAsync("sengelha", mDbHelper, mAdapter);
     }
 
     @Override

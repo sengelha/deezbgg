@@ -32,52 +32,17 @@ import info.deez.deezbgg.repository.DeezbggDbHelper;
  * Some pieces of information (e.g. bitmaps) are loaded on-demand
  * by the adapter.
  */
-class CollectionLoader extends BaseLoader<List<CollectionFragmentRowData>> {
+public class CollectionLoader extends BaseLoader<List<CollectionFragmentRowData>> {
     private static final String TAG = "CollectionLoader";
-    private CollectionItemRepository mCollectionItemRepository;
-    private BoardGameRepository mBoardGameRepository;
+    private CollectionFragmentDataGetter mDataGetter;
 
     public CollectionLoader(Context context, DeezbggDbHelper dbHelper) {
         super(context);
-        mCollectionItemRepository = new CollectionItemRepository(dbHelper);
-        mBoardGameRepository = new BoardGameRepository(dbHelper);
+        mDataGetter = new CollectionFragmentDataGetter(dbHelper);
     }
 
     @Override
     public List<CollectionFragmentRowData> loadInBackground() {
-        Log.i(TAG, "Starting load in background");
-        List<CollectionItem> collectionItems = mCollectionItemRepository.getAllCollectionItems();
-        Set<Long> boardGameIds = new HashSet<Long>();
-        for (CollectionItem collectionItem : collectionItems) {
-            boardGameIds.add(collectionItem.boardGameId);
-        }
-        Dictionary<Long, BoardGame> boardGames = mBoardGameRepository.getBoardGamesByIds(boardGameIds);
-
-        List<CollectionFragmentRowData> rows = new ArrayList<CollectionFragmentRowData>(collectionItems.size());
-        for (CollectionItem collectionItem : collectionItems) {
-            CollectionFragmentRowData row = new CollectionFragmentRowData();
-            row.collectionItem = collectionItem;
-            row.boardGame = boardGames.get(row.collectionItem.boardGameId);
-            rows.add(row);
-        }
-
-        Collections.sort(rows, new Comparator<CollectionFragmentRowData>() {
-            @Override
-            public int compare(CollectionFragmentRowData lhs, CollectionFragmentRowData rhs) {
-                String leftName = (lhs != null && lhs.boardGame != null ? lhs.boardGame.name : null);
-                String rightName = (rhs != null && rhs.boardGame != null ? rhs.boardGame.name : null);
-                if (leftName == null && rightName == null)
-                    return 0;
-                else if (leftName == null)
-                    return 1;
-                else if (rightName == null)
-                    return -1;
-                else
-                    return leftName.compareTo(rightName);
-            }
-        });
-
-        Log.i(TAG, "Finished load in background.  Loaded " + rows.size() + " rows");
-        return rows;
+        return mDataGetter.getData();
     }
 }
