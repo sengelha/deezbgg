@@ -12,6 +12,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import info.deez.deezbgg.R;
+import info.deez.deezbgg.bitmap.BitmapUtils;
 
 class PlaysFragmentAdapter extends BaseAdapter {
     private static final String TAG = "PlaysFragmentAdapter";
@@ -58,17 +59,19 @@ class PlaysFragmentAdapter extends BaseAdapter {
         }
         PlaysFragmentRowData rowData = getItem(position);
         if (rowData != null) {
-            if (rowData.boardGameBitmap != null) {
-                ImageView iv = (ImageView) v.findViewById(R.id.boardGameThumbnail);
-                if (iv != null) {
-                    iv.setImageBitmap(rowData.boardGameBitmap);
+            if (rowData.boardGame != null) {
+                if (rowData.boardGame.name != null) {
+                    TextView tvTitle = (TextView) v.findViewById(R.id.boardGameName);
+                    if (tvTitle != null) {
+                        tvTitle.setText(rowData.boardGame.name);
+                    }
                 }
-            }
 
-            if (rowData.boardGame != null && rowData.boardGame.name != null) {
-                TextView tvTitle = (TextView) v.findViewById(R.id.boardGameName);
-                if (tvTitle != null) {
-                    tvTitle.setText(rowData.boardGame.name);
+                if (rowData.boardGame.thumbnailUrl != null) {
+                    ImageView iv = (ImageView) v.findViewById(R.id.boardGameThumbnail);
+                    if (iv != null) {
+                        BitmapUtils.loadBitmapIntoImageViewAsync(rowData.boardGame.thumbnailUrl, iv);
+                    }
                 }
             }
 

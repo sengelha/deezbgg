@@ -8,6 +8,5 @@ import info.deez.deezbgg.entity.Play;
 class PlaysFragmentRowData {
     public Play play;
     public BoardGame boardGame;
-    public Bitmap boardGameBitmap;
 }
 

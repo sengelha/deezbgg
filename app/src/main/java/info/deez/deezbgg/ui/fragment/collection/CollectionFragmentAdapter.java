@@ -9,9 +9,12 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import info.deez.deezbgg.R;
+import info.deez.deezbgg.bitmap.BitmapUtils;
 
 class CollectionFragmentAdapter extends BaseAdapter {
     private static final String TAG = "CollectionFragmentAdapter";
@@ -57,17 +60,19 @@ class CollectionFragmentAdapter extends BaseAdapter {
         }
         CollectionFragmentRowData rowData = getItem(position);
         if (rowData != null) {
-            if (rowData.boardGameBitmap != null) {
-                ImageView iv = (ImageView) v.findViewById(R.id.boardGameThumbnail);
-                if (iv != null) {
-                    iv.setImageBitmap(rowData.boardGameBitmap);
+            if (rowData.boardGame != null) {
+                if (rowData.boardGame.name != null) {
+                    TextView tvTitle = (TextView) v.findViewById(R.id.boardGameName);
+                    if (tvTitle != null) {
+                        tvTitle.setText(rowData.boardGame.name);
+                    }
                 }
-            }
 
-            if (rowData.boardGame != null && rowData.boardGame.name != null) {
-                TextView tvTitle = (TextView) v.findViewById(R.id.boardGameName);
-                if (tvTitle != null) {
-                    tvTitle.setText(rowData.boardGame.name);
+                if (rowData.boardGame.thumbnailUrl != null) {
+                    ImageView ivThumbnail = (ImageView) v.findViewById(R.id.boardGameThumbnail);
+                    if (ivThumbnail != null) {
+                        BitmapUtils.loadBitmapIntoImageViewAsync(rowData.boardGame.thumbnailUrl, ivThumbnail);
+                    }
                 }
             }
         }

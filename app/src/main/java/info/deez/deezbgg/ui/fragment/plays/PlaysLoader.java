@@ -42,30 +42,11 @@ class PlaysLoader extends BaseLoader<List<PlaysFragmentRowData>> {
         }
         Dictionary<Long, BoardGame> boardGames = BoardGameRepository.getBoardGamesByIds(boardGameIds);
 
-        Dictionary<Long, Bitmap> boardGameBitmaps = new Hashtable<Long, Bitmap>();
-        for (Long boardGameId : boardGameIds) {
-            try {
-                URL url = new URL(boardGames.get(boardGameId).thumbnailUrl);
-                URLConnection conn = url.openConnection();
-                InputStream inputStream = conn.getInputStream();
-                try {
-                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                    boardGameBitmaps.put(boardGameId, bitmap);
-                } finally {
-                    inputStream.close();
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Error loading board game bitmap", e);
-            }
-
-        }
-
         List<PlaysFragmentRowData> rows = new ArrayList<PlaysFragmentRowData>(plays.size());
         for (Play play : plays) {
             PlaysFragmentRowData row = new PlaysFragmentRowData();
             row.play = play;
             row.boardGame = boardGames.get(row.play.boardGameId);
-            row.boardGameBitmap = boardGameBitmaps.get(row.play.boardGameId);
             rows.add(row);
         }
 

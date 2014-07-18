@@ -9,6 +9,5 @@ import info.deez.deezbgg.entity.Play;
 class CollectionFragmentRowData {
     public CollectionItem collectionItem;
     public BoardGame boardGame;
-    public Bitmap boardGameBitmap;
 }
 
