@@ -26,6 +26,7 @@ class BitmapWorkerTask extends AsyncTask<URL, Void, Bitmap> {
         try {
             URL url = params[0];
             URLConnection conn = url.openConnection();
+            conn.setUseCaches(true);
             InputStream inputStream = conn.getInputStream();
             try {
                 return BitmapFactory.decodeStream(inputStream);
