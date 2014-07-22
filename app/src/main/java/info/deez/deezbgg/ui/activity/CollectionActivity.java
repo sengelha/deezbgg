@@ -7,12 +7,11 @@ import android.view.MenuInflater;
 
 import info.deez.deezbgg.R;
 
-
-public class MainActivity extends Activity {
+public class CollectionActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_collection);
     }
 
     @Override
