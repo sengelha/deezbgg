@@ -6,4 +6,13 @@ package info.deez.deezbgg.entity;
 public class CollectionItem {
     public long id;
     public long boardGameId;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof CollectionItem))
+            return false;
+
+        CollectionItem rhs = (CollectionItem)obj;
+        return id == rhs.id && boardGameId == rhs.boardGameId;
+    }
 }
