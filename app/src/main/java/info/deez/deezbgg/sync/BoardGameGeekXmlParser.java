@@ -1,4 +1,4 @@
-package info.deez.deezbgg.bggapi;
+package info.deez.deezbgg.sync;
 
 import android.util.Log;
 import android.util.Pair;

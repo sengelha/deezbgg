@@ -22,8 +22,20 @@ public class CollectionItemRepository {
     }
 
     public void addCollectionItem(CollectionItem collectionItem) {
-        Log.i(TAG, "Adding collection item id=" + collectionItem.id + " boardGameId=" + collectionItem.boardGameId);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        addCollectionItemHelper(db, collectionItem);
+    }
+
+    public void addCollectionItems(Collection<CollectionItem> collectionItems) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        for (CollectionItem collectionItem : collectionItems) {
+            addCollectionItemHelper(db, collectionItem);
+        }
+    }
+
+    private void addCollectionItemHelper(SQLiteDatabase db, CollectionItem collectionItem) {
+        Log.i(TAG, "Adding collection item id=" + collectionItem.id + " boardGameId=" + collectionItem.boardGameId);
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(DeezbggContract.CollectionItemEntry.COLUMN_NAME_COLLECTION_ITEM_ID, collectionItem.id);
@@ -31,17 +43,23 @@ public class CollectionItemRepository {
         db.insert(DeezbggContract.CollectionItemEntry.TABLE_NAME, null, contentValues);
     }
 
-    public void addCollectionItems(Collection<CollectionItem> collectionItems) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        for (CollectionItem collectionItem : collectionItems) {
-            addCollectionItem(collectionItem);
-        }
-    }
-
     public void deleteAllCollectionItems() {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         db.delete(DeezbggContract.CollectionItemEntry.TABLE_NAME, null, null);
+    }
+
+    public void deleteCollectionItems(Collection<CollectionItem> collectionItems) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        for (CollectionItem collectionItem : collectionItems) {
+            deleteCollectionItemHelper(db, collectionItem);
+        }
+    }
+
+    private void deleteCollectionItemHelper(SQLiteDatabase db, CollectionItem collectionItem) {
+        Log.i(TAG, "Deleting collection item id=" + collectionItem.id + " boardGameId=" + collectionItem.boardGameId);
+        db.delete(DeezbggContract.CollectionItemEntry.TABLE_NAME,
+                DeezbggContract.CollectionItemEntry.COLUMN_NAME_COLLECTION_ITEM_ID + "=?",
+                new String[] { Long.toString(collectionItem.id) });
     }
 
     public List<CollectionItem> getAllCollectionItems() {

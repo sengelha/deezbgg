@@ -9,17 +9,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
-import info.deez.deezbgg.bggapi.BoardGameGeekXmlParser;
 import info.deez.deezbgg.entity.BoardGame;
-import info.deez.deezbgg.entity.CollectionItem;
 import info.deez.deezbgg.entity.Play;
 import info.deez.deezbgg.repository.BoardGameRepository;
-import info.deez.deezbgg.repository.CollectionItemRepository;
 import info.deez.deezbgg.repository.DeezbggDbHelper;
 import info.deez.deezbgg.repository.PlayRepository;
-import info.deez.deezbgg.ui.fragment.collection.CollectionFragmentAdapter;
-import info.deez.deezbgg.ui.fragment.collection.CollectionFragmentDataGetter;
-import info.deez.deezbgg.ui.fragment.collection.CollectionFragmentRowData;
 import info.deez.deezbgg.ui.fragment.plays.PlaysFragmentAdapter;
 import info.deez.deezbgg.ui.fragment.plays.PlaysFragmentDataGetter;
 import info.deez.deezbgg.ui.fragment.plays.PlaysFragmentRowData;

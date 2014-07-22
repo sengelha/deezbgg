@@ -1,28 +1,23 @@
 package info.deez.deezbgg.sync;
 
-import android.app.Fragment;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.Pair;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.List;
 
-import info.deez.deezbgg.bggapi.BoardGameGeekXmlParser;
 import info.deez.deezbgg.entity.BoardGame;
 import info.deez.deezbgg.entity.CollectionItem;
 import info.deez.deezbgg.repository.BoardGameRepository;
 import info.deez.deezbgg.repository.CollectionItemRepository;
 import info.deez.deezbgg.repository.DeezbggDbHelper;
-import info.deez.deezbgg.ui.fragment.collection.CollectionFragment;
 import info.deez.deezbgg.ui.fragment.collection.CollectionFragmentAdapter;
 import info.deez.deezbgg.ui.fragment.collection.CollectionFragmentDataGetter;
 import info.deez.deezbgg.ui.fragment.collection.CollectionFragmentRowData;
-import info.deez.deezbgg.ui.fragment.collection.CollectionLoader;
 
 public class CollectionSyncTask extends AsyncTask<String, Void, List<CollectionFragmentRowData>> {
     private static final String TAG = "CollectionSyncTask";
@@ -39,25 +34,19 @@ public class CollectionSyncTask extends AsyncTask<String, Void, List<CollectionF
         try {
             Log.i(TAG, "Starting sync of collection...");
             String username = params[0];
-            URL url = new URL("http://boardgamegeek.com/xmlapi2/collection?username=" + username);
-            URLConnection conn = url.openConnection();
-            BoardGameGeekXmlParser parser = new BoardGameGeekXmlParser();
 
-            List<Pair<CollectionItem, BoardGame>> results;
-            InputStream stream = conn.getInputStream();
-            try {
-                results = parser.parseCollection(stream);
-            } finally {
-                stream.close();
-            }
-
-            // Put data in database
             CollectionItemRepository collectionItemRepository = new CollectionItemRepository(mDbHelper);
-            BoardGameRepository boardGameRepository = new BoardGameRepository(mDbHelper);
-            for (Pair<CollectionItem, BoardGame> result : results) {
-                collectionItemRepository.upsertCollectionItem(result.first);
-                boardGameRepository.upsertBoardGame(result.second);
-            }
+
+            List<CollectionItem> currentCollection = collectionItemRepository.getAllCollectionItems();
+            List<CollectionItem> targetCollection = BoardGameGeekApi.getCollectionForUser(username);
+
+            // Figure out what to add
+            List<CollectionItem> itemsToAdd = new ArrayList<CollectionItem>();
+            List<CollectionItem> itemsToRemove = new ArrayList<CollectionItem>();
+            SyncUtils.determineChanges(currentCollection, targetCollection, itemsToAdd, itemsToRemove);
+
+            collectionItemRepository.addCollectionItems(itemsToAdd);
+            collectionItemRepository.deleteCollectionItems(itemsToRemove);
 
             // Get new UI-ready data
             CollectionFragmentDataGetter dataGetter = new CollectionFragmentDataGetter(mDbHelper);
