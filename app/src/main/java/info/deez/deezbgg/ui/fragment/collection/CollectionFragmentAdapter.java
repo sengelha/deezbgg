@@ -1,81 +1,56 @@
 package info.deez.deezbgg.ui.fragment.collection;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
+import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-
 import info.deez.deezbgg.R;
-import info.deez.deezbgg.bitmap.BitmapUtils;
+import info.deez.deezbgg.content.ContentContract;
 
-public class CollectionFragmentAdapter extends BaseAdapter {
+public class CollectionFragmentAdapter extends CursorAdapter {
+    private class ViewHolder {
+        public TextView boardGameName;
+        public TextView boardGameYearPublished;
+    }
+
     private static final String TAG = "CollectionFragmentAdapter";
-    private List<CollectionFragmentRowData> mCollection;
-    private Context mContext;
 
-    public CollectionFragmentAdapter(Context context) {
-        mContext = context;
-    }
+    public static final String[] COLUMNS = {
+            ContentContract.CollectionItemEntry._ID,
+            ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_NAME,
+            ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_YEAR_PUBLISHED,
+    };
 
-    public void swapCollectionData(List<CollectionFragmentRowData> collection) {
-        Log.i(TAG, "Swapping collection data");
-        mCollection = collection;
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public int getCount() {
-        int count = mCollection != null ? mCollection.size() : 0;
-        Log.i(TAG, "Getting count (value = " + count + ")");
-        return count;
+    public CollectionFragmentAdapter(Context context, Cursor cursor, int flags) {
+        super(context, cursor, flags);
     }
 
     @Override
-    public CollectionFragmentRowData getItem(int position) {
-        Log.i(TAG, "Getting item at position " + position);
-        return mCollection.get(position);
+    public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
+        Log.i(TAG, "In CollectionFragmentAdapter.newView()");
+
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View layoutView = inflater.inflate(R.layout.row_collection, null);
+
+        ViewHolder holder = new ViewHolder();
+        holder.boardGameName = (TextView) layoutView.findViewById(R.id.boardGameName);
+        holder.boardGameYearPublished = (TextView) layoutView.findViewById(R.id.boardGameYearPublished);
+        layoutView.setTag(holder);
+
+        return layoutView;
     }
 
     @Override
-    public long getItemId(int position) {
-        Log.i(TAG, "Getting item id at position " + position);
-        return mCollection.get(position).collectionItem.id;
-    }
+    public void bindView(View view, Context context, Cursor cursor) {
+        Log.i(TAG, "In CollectionFragmentAdapter.bindView()");
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        Log.i(TAG, "In getView for position " + position);
-        View v = convertView;
-        if (v == null) {
-            LayoutInflater vi = LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_collection, parent, false);
-        }
-        CollectionFragmentRowData rowData = getItem(position);
-        if (rowData != null) {
-            if (rowData.boardGame != null) {
-                if (rowData.boardGame.name != null) {
-                    TextView tvTitle = (TextView) v.findViewById(R.id.boardGameName);
-                    if (tvTitle != null) {
-                        tvTitle.setText(rowData.boardGame.name);
-                    }
-                }
-
-                if (rowData.boardGame.thumbnailUrl != null) {
-                    ImageView ivThumbnail = (ImageView) v.findViewById(R.id.boardGameThumbnail);
-                    if (ivThumbnail != null) {
-                        BitmapUtils.loadBitmapIntoImageViewAsync(rowData.boardGame.thumbnailUrl, ivThumbnail);
-                    }
-                }
-            }
-        }
-        return v;
+        ViewHolder holder = (ViewHolder) view.getTag();
+        holder.boardGameName.setText(cursor.getString(cursor.getColumnIndex(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_NAME)));
+        holder.boardGameYearPublished.setText(cursor.getString(cursor.getColumnIndex(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_YEAR_PUBLISHED)));
     }
 }

@@ -1,16 +1,22 @@
 package info.deez.deezbgg.ui.activity;
 
+import android.accounts.Account;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 
 import info.deez.deezbgg.R;
+import info.deez.deezbgg.accounts.AccountUtils;
+import info.deez.deezbgg.sync.SyncUtils;
 
 public class CollectionActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SyncUtils.createAccountAndEnableSync(this);
+
         setContentView(R.layout.activity_collection);
     }
 

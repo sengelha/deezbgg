@@ -1,11 +1,13 @@
 package info.deez.deezbgg.ui.fragment.plays;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,75 +15,47 @@ import java.util.List;
 
 import info.deez.deezbgg.R;
 import info.deez.deezbgg.bitmap.BitmapUtils;
+import info.deez.deezbgg.content.ContentContract;
 
-public class PlaysFragmentAdapter extends BaseAdapter {
+public class PlaysFragmentAdapter extends CursorAdapter {
+    private class ViewHolder {
+        public TextView boardGameName;
+        public TextView playDate;
+    }
+
     private static final String TAG = "PlaysFragmentAdapter";
-    private List<PlaysFragmentRowData> mPlays;
-    private Context mContext;
 
-    public PlaysFragmentAdapter(Context context) {
-        mContext = context;
-    }
+    public static final String[] COLUMNS = {
+            ContentContract.PlayEntry._ID,
+            ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_NAME,
+            ContentContract.PlayEntry.COLUMN_NAME_PLAY_DATE,
+    };
 
-    public void swapPlayData(List<PlaysFragmentRowData> plays) {
-        Log.i(TAG, "Swapping play data");
-        mPlays = plays;
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public int getCount() {
-        int count = mPlays != null ? mPlays.size() : 0;
-        Log.i(TAG, "Getting count (value = " + count + ")");
-        return count;
+    public PlaysFragmentAdapter(Context context, Cursor cursor, int flags) {
+        super(context, cursor, flags);
     }
 
     @Override
-    public PlaysFragmentRowData getItem(int position) {
-        Log.i(TAG, "Getting item at position " + position);
-        return mPlays.get(position);
+    public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
+        Log.i(TAG, "In PlaysFragmentAdapter.newView()");
+
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View layoutView = inflater.inflate(R.layout.row_plays, null);
+
+        ViewHolder holder = new ViewHolder();
+        holder.boardGameName = (TextView) layoutView.findViewById(R.id.boardGameName);
+        holder.playDate = (TextView) layoutView.findViewById(R.id.playDate);
+        layoutView.setTag(holder);
+
+        return layoutView;
     }
 
     @Override
-    public long getItemId(int position) {
-        Log.i(TAG, "Getting item id at position " + position);
-        return mPlays.get(position).play.id;
-    }
+    public void bindView(View view, Context context, Cursor cursor) {
+        Log.i(TAG, "In PlaysFragmentAdapter.bindView()");
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        Log.i(TAG, "In getView for position " + position);
-
-        View v = convertView;
-        if (v == null) {
-            LayoutInflater vi = LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_plays, parent, false);
-        }
-        PlaysFragmentRowData rowData = getItem(position);
-        if (rowData != null) {
-            if (rowData.boardGame != null) {
-                if (rowData.boardGame.name != null) {
-                    TextView tvTitle = (TextView) v.findViewById(R.id.boardGameName);
-                    if (tvTitle != null) {
-                        tvTitle.setText(rowData.boardGame.name);
-                    }
-                }
-
-                if (rowData.boardGame.thumbnailUrl != null) {
-                    ImageView iv = (ImageView) v.findViewById(R.id.boardGameThumbnail);
-                    if (iv != null) {
-                        BitmapUtils.loadBitmapIntoImageViewAsync(rowData.boardGame.thumbnailUrl, iv);
-                    }
-                }
-            }
-
-            if (rowData.play != null && rowData.play.date != null) {
-                TextView tvTitle = (TextView) v.findViewById(R.id.playDate);
-                if (tvTitle != null) {
-                    tvTitle.setText(rowData.play.date);
-                }
-            }
-        }
-        return v;
+        ViewHolder holder = (ViewHolder) view.getTag();
+        holder.boardGameName.setText(cursor.getString(cursor.getColumnIndex(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_NAME)));
+        holder.playDate.setText(cursor.getString(cursor.getColumnIndex(ContentContract.PlayEntry.COLUMN_NAME_PLAY_DATE)));
     }
 }

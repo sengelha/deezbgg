@@ -10,4 +10,5 @@ public class BoardGame {
     public String name;
     public URL thumbnailUrl;
     public URL imageUrl;
+    public int yearPublished;
 }

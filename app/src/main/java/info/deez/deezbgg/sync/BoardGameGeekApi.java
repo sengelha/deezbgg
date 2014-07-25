@@ -19,7 +19,7 @@ import info.deez.deezbgg.entity.CollectionItem;
  * Created by sengelha on 7/22/2014.
  */
 public class BoardGameGeekApi {
-    public static List<CollectionItem> getCollectionForUser(String username) throws IOException, XmlPullParserException {
+    public static List<Pair<CollectionItem, BoardGame>> getCollectionForUser(String username) throws IOException, XmlPullParserException {
         URL url = new URL("http://boardgamegeek.com/xmlapi2/collection?username=" + username);
         URLConnection conn = url.openConnection();
         BoardGameGeekXmlParser parser = new BoardGameGeekXmlParser();
@@ -32,9 +32,6 @@ public class BoardGameGeekApi {
             stream.close();
         }
 
-        List<CollectionItem> collectionItems = new ArrayList<CollectionItem>();
-        for (Pair<CollectionItem, BoardGame> apiResult : apiResults)
-            collectionItems.add(apiResult.first);
-        return collectionItems;
+        return apiResults;
     }
 }
