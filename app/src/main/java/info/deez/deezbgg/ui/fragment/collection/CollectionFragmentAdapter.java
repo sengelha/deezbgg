@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import info.deez.deezbgg.R;
 import info.deez.deezbgg.bitmap.AsyncDrawable;
+import info.deez.deezbgg.bitmap.BitmapMemoryCache;
 import info.deez.deezbgg.bitmap.BitmapWorkerTask;
 import info.deez.deezbgg.content.ContentContract;
 
@@ -33,10 +34,12 @@ public class CollectionFragmentAdapter extends CursorAdapter {
     };
 
     private Context mContext;
+    private BitmapMemoryCache mMemoryCache;
 
-    public CollectionFragmentAdapter(Context context, Cursor cursor, int flags) {
+    public CollectionFragmentAdapter(Context context, Cursor cursor, int flags, BitmapMemoryCache memoryCache) {
         super(context, cursor, flags);
         mContext = context;
+        mMemoryCache = memoryCache;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class CollectionFragmentAdapter extends CursorAdapter {
 
         if (thumbnailUrl != null) {
             if (cancelPotentialWork(thumbnailUrl, holder.thumbnail)) {
-                final BitmapWorkerTask task = new BitmapWorkerTask(holder.thumbnail);
+                final BitmapWorkerTask task = new BitmapWorkerTask(holder.thumbnail, mMemoryCache);
                 final AsyncDrawable asyncDrawable = new AsyncDrawable(mContext.getResources(), null, task);
                 holder.thumbnail.setImageDrawable(asyncDrawable);
                 task.execute(thumbnailUrl);

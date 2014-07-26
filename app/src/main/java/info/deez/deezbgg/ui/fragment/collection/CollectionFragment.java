@@ -16,6 +16,7 @@ import android.view.View;
 
 import info.deez.deezbgg.R;
 import info.deez.deezbgg.accounts.AccountUtils;
+import info.deez.deezbgg.bitmap.BitmapMemoryCache;
 import info.deez.deezbgg.content.ContentContract;
 import info.deez.deezbgg.sync.SyncUtils;
 
@@ -43,11 +44,16 @@ public class CollectionFragment extends ListFragment implements LoaderManager.Lo
         }
     };
     private Menu mOptionsMenu;
+    private BitmapMemoryCache mBitmapCache;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int cacheSize = maxMemory / 8;
+        mBitmapCache = new BitmapMemoryCache(cacheSize);
     }
 
     @Override
@@ -60,7 +66,7 @@ public class CollectionFragment extends ListFragment implements LoaderManager.Lo
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAdapter = new CollectionFragmentAdapter(getActivity(), null, 0);
+        mAdapter = new CollectionFragmentAdapter(getActivity(), null, 0, mBitmapCache);
         setListAdapter(mAdapter);
         // TODO: setEmptyText()
         getLoaderManager().initLoader(0, null, this);

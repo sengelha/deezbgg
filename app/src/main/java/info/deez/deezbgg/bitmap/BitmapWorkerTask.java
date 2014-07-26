@@ -15,10 +15,12 @@ import java.net.URLConnection;
 public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
     private static final String TAG = "BitmapWorkerTask";
     private final WeakReference<ImageView> mImageViewReference;
+    private BitmapMemoryCache mMemoryCache;
     private String url = null;
 
-    public BitmapWorkerTask(ImageView imageView) {
+    public BitmapWorkerTask(ImageView imageView, BitmapMemoryCache memoryCache) {
         mImageViewReference = new WeakReference<ImageView>(imageView);
+        mMemoryCache = memoryCache;
     }
 
     public String getUrl() {
@@ -30,7 +32,12 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
     protected Bitmap doInBackground(String... params) {
         url = params[0];
         try {
-            return decodeSampledBitmapFromUrl(url);
+            Bitmap bitmap = getBitmapFromCache(url);
+            if (bitmap == null) {
+                bitmap = decodeSampledBitmapFromUrl(url);
+            }
+            addBitmapToCache(url, bitmap);
+            return bitmap;
         } catch (IOException e) {
             Log.e(TAG, "Error loading image: " + e);
             return null;
@@ -46,6 +53,14 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
                 imageView.setImageBitmap(bitmap);
             }
         }
+    }
+
+    private void addBitmapToCache(String key, Bitmap bitmap) {
+        mMemoryCache.put(key, bitmap);
+    }
+
+    private Bitmap getBitmapFromCache(String key) {
+        return mMemoryCache.get(key);
     }
 
     private Bitmap decodeSampledBitmapFromUrl(String urlString) throws IOException {
