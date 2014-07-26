@@ -93,9 +93,9 @@ public class BoardGameGeekXmlParser {
             if (name.equals("name")) {
                 boardGame.name = readName(parser);
             } else if (name.equals("thumbnail")) {
-                boardGame.thumbnailUrl = readThumbnailUrl(parser);
+                boardGame.setThumbnailUrl(readThumbnailUrl(parser));
             } else if (name.equals("yearpublished")) {
-                boardGame.yearPublished = readYearPublished(parser);
+                boardGame.setYearPublished(readYearPublished(parser));
             } else {
                 skip(parser);
             }

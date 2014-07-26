@@ -1,7 +1,5 @@
 package info.deez.deezbgg.ui.fragment.plays;
 
-import java.util.List;
-
 import android.accounts.Account;
 import android.app.Activity;
 import android.app.ListFragment;
@@ -12,18 +10,16 @@ import android.content.Loader;
 import android.content.SyncStatusObserver;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
 
 import info.deez.deezbgg.R;
 import info.deez.deezbgg.accounts.AccountUtils;
+import info.deez.deezbgg.bitmap.BitmapMemoryCache;
 import info.deez.deezbgg.content.ContentContract;
-import info.deez.deezbgg.db.DbHelper;
 import info.deez.deezbgg.sync.SyncUtils;
-import info.deez.deezbgg.ui.fragment.collection.CollectionFragmentAdapter;
+import info.deez.deezbgg.ui.fragment.plays.PlaysFragmentAdapter;
 
 public class PlaysFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "PlaysFragment";
@@ -49,11 +45,16 @@ public class PlaysFragment extends ListFragment implements LoaderManager.LoaderC
         }
     };
     private Menu mOptionsMenu;
+    private BitmapMemoryCache mBitmapCache;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int cacheSize = maxMemory / 8;
+        mBitmapCache = new BitmapMemoryCache(cacheSize);
     }
 
     @Override
@@ -66,7 +67,7 @@ public class PlaysFragment extends ListFragment implements LoaderManager.LoaderC
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAdapter = new PlaysFragmentAdapter(getActivity(), null, 0);
+        mAdapter = new PlaysFragmentAdapter(getActivity(), null, 0, mBitmapCache);
         setListAdapter(mAdapter);
         // TODO: setEmptyText()
         getLoaderManager().initLoader(0, null, this);

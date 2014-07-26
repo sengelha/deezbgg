@@ -36,6 +36,7 @@ public class ContentContract {
         // Use _ID for the collection item id
         public static final String COLUMN_NAME_BOARD_GAME_ID = "boardGameId";
         public static final String COLUMN_NAME_BOARD_GAME_NAME = "boardGameName";
+        public static final String COLUMN_NAME_BOARD_GAME_THUMBNAIL_URL = "boardGameThumbnailUrl";
         public static final String COLUMN_NAME_PLAY_DATE = "playDate";
     }
 }

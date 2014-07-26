@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment_container"
+    android:id="@+id/fragment_plays"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <fragment android:name="info.deez.deezbgg.ui.fragment.collection.CollectionFragment"
+    <fragment android:name="info.deez.deezbgg.ui.fragment.plays.PlaysFragment"
         android:id="@+id/list"
         android:layout_weight="1"
         android:layout_width="match_parent"

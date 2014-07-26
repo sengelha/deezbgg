@@ -6,19 +6,22 @@ import android.view.Menu;
 import android.view.MenuInflater;
 
 import info.deez.deezbgg.R;
+import info.deez.deezbgg.sync.SyncUtils;
 
-
-public class MainActivity extends Activity {
+public class PlaysActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        SyncUtils.createAccountAndEnableSync(this);
+
+        setContentView(R.layout.activity_plays);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_collection, menu);
+        inflater.inflate(R.menu.menu_plays, menu);
         return true;
     }
 }

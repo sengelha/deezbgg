@@ -20,6 +20,7 @@ public class ContentProvider extends android.content.ContentProvider {
     private static final int ROUTE_COLLECTION_ITEM = 2;
     private static final int ROUTE_BOARD_GAMES = 3;
     private static final int ROUTE_BOARD_GAME = 4;
+    private static final int ROUTE_PLAYS = 5;
     private static final int ROUTE_INVALID = -1;
     private static final UriMatcher sUriMatcher;
     private DbHelper mDbHelper;
@@ -42,6 +43,10 @@ public class ContentProvider extends android.content.ContentProvider {
                 ContentContract.CONTENT_AUTHORITY,
                 ContentContract.BoardGameEntry.TABLE_NAME + "/*",
                 ROUTE_BOARD_GAME);
+        sUriMatcher.addURI(
+                ContentContract.CONTENT_AUTHORITY,
+                ContentContract.PlayEntry.TABLE_NAME,
+                ROUTE_PLAYS);
     }
     @Override
     public boolean onCreate() {
@@ -147,6 +152,67 @@ public class ContentProvider extends android.content.ContentProvider {
                 sb.append(" FROM ");
                 sb.append(DbContract.BoardGameEntry.TABLE_NAME);
                 sb.append(" BG");
+                if (sortOrder == null) {
+                    // Do nothing
+                } else {
+                    throw new UnsupportedOperationException("Unhandled sort order: " + sortOrder);
+                }
+                return db.rawQuery(sb.toString(), null);
+            }
+            case ROUTE_PLAYS: {
+                StringBuilder sb = new StringBuilder();
+                sb.append("SELECT ");
+                boolean first = true;
+                for (String column : projection) {
+                    if (!first)
+                        sb.append(", ");
+                    if (column.equals(ContentContract.PlayEntry._ID)) {
+                        sb.append("P.");
+                        sb.append(DbContract.PlayEntry._ID);
+                        sb.append(" AS ");
+                        sb.append(ContentContract.PlayEntry._ID);
+                    } else if (column.equals(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_ID)) {
+                        sb.append("P.");
+                        sb.append(DbContract.PlayEntry.COLUMN_NAME_BOARD_GAME_ID);
+                        sb.append(" AS ");
+                        sb.append(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_ID);
+                    } else if (column.equals(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_NAME)) {
+                        sb.append("BG.");
+                        sb.append(DbContract.BoardGameEntry.COLUMN_NAME_NAME);
+                        sb.append(" AS ");
+                        sb.append(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_NAME);
+                    } else if (column.equals(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_THUMBNAIL_URL)) {
+                        sb.append("BG.");
+                        sb.append(DbContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL);
+                        sb.append(" AS ");
+                        sb.append(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_THUMBNAIL_URL);
+                    } else if (column.equals(ContentContract.PlayEntry.COLUMN_NAME_PLAY_DATE)) {
+                        sb.append("P.");
+                        sb.append(DbContract.PlayEntry.COLUMN_NAME_PLAY_DATE);
+                        sb.append(" AS ");
+                        sb.append(ContentContract.PlayEntry.COLUMN_NAME_PLAY_DATE);
+                    } else {
+                        throw new UnsupportedOperationException("Unhandled column: " + column);
+                    }
+                    first = false;
+                }
+                sb.append(" FROM ");
+                sb.append(DbContract.PlayEntry.TABLE_NAME);
+                sb.append(" P LEFT OUTER JOIN ");
+                sb.append(DbContract.BoardGameEntry.TABLE_NAME);
+                sb.append(" BG ON BG.");
+                sb.append(DbContract.BoardGameEntry._ID);
+                sb.append("=P.");
+                sb.append(DbContract.PlayEntry.COLUMN_NAME_BOARD_GAME_ID);
+                if (sortOrder == null) {
+                    // Do nothing
+                } else if (sortOrder.equals(ContentContract.PlayEntry.COLUMN_NAME_PLAY_DATE)) {
+                    sb.append(" ORDER BY P.");
+                    sb.append(DbContract.PlayEntry.COLUMN_NAME_PLAY_DATE);
+                    sb.append(" DESC");
+                } else {
+                    throw new UnsupportedOperationException("Unhandled sort order: " + sortOrder);
+                }
                 return db.rawQuery(sb.toString(), null);
             }
             default:
@@ -200,6 +266,25 @@ public class ContentProvider extends android.content.ContentProvider {
 
                 long id = db.insertOrThrow(DbContract.BoardGameEntry.TABLE_NAME, null, dbContentValues);
                 result = Uri.withAppendedPath(ContentContract.BoardGameEntry.CONTENT_URI, Long.toString(id));
+                break;
+            }
+            case ROUTE_PLAYS: {
+                ContentValues dbContentValues = new ContentValues();
+
+                for (Map.Entry<String, Object> e : contentValues.valueSet()) {
+                    if (e.getKey().equals(ContentContract.PlayEntry._ID)) {
+                        dbContentValues.put(DbContract.PlayEntry._ID, (Long) e.getValue());
+                    } else if (e.getKey().equals(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_ID)) {
+                        dbContentValues.put(DbContract.PlayEntry.COLUMN_NAME_BOARD_GAME_ID, (Long) e.getValue());
+                    } else if (e.getKey().equals(ContentContract.PlayEntry.COLUMN_NAME_PLAY_DATE)) {
+                        dbContentValues.put(DbContract.PlayEntry.COLUMN_NAME_PLAY_DATE, (String) e.getValue());
+                    } else {
+                        throw new UnsupportedOperationException("Unhandled key: " + e.getKey());
+                    }
+                }
+
+                long id = db.insertOrThrow(DbContract.PlayEntry.TABLE_NAME, null, dbContentValues);
+                result = Uri.withAppendedPath(ContentContract.PlayEntry.CONTENT_URI, Long.toString(id));
                 break;
             }
             default:
