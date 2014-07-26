@@ -14,7 +14,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import info.deez.deezbgg.R;
-import info.deez.deezbgg.bitmap.BitmapUtils;
 import info.deez.deezbgg.content.ContentContract;
 
 public class PlaysFragmentAdapter extends CursorAdapter {

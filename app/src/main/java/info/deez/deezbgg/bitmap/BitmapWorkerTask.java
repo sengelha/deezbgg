@@ -12,29 +12,27 @@ import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.net.URLConnection;
 
-class BitmapWorkerTask extends AsyncTask<URL, Void, Bitmap> {
+public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
     private static final String TAG = "BitmapWorkerTask";
     private final WeakReference<ImageView> mImageViewReference;
+    private String url = null;
 
     public BitmapWorkerTask(ImageView imageView) {
         mImageViewReference = new WeakReference<ImageView>(imageView);
     }
 
+    public String getUrl() {
+        return url;
+    }
+
     // Decode image in background.
     @Override
-    protected Bitmap doInBackground(URL... params) {
+    protected Bitmap doInBackground(String... params) {
+        url = params[0];
         try {
-            URL url = params[0];
-            URLConnection conn = url.openConnection();
-            conn.setUseCaches(true);
-            InputStream inputStream = conn.getInputStream();
-            try {
-                return BitmapFactory.decodeStream(inputStream);
-            } finally {
-                inputStream.close();
-            }
+            return decodeSampledBitmapFromUrl(url);
         } catch (IOException e) {
-            Log.e(TAG, "Error loading bitmap", e);
+            Log.e(TAG, "Error loading image: " + e);
             return null;
         }
     }
@@ -47,6 +45,17 @@ class BitmapWorkerTask extends AsyncTask<URL, Void, Bitmap> {
             if (imageView != null) {
                 imageView.setImageBitmap(bitmap);
             }
+        }
+    }
+
+    private Bitmap decodeSampledBitmapFromUrl(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        URLConnection conn = url.openConnection();
+        InputStream stream = conn.getInputStream();
+        try {
+            return BitmapFactory.decodeStream(stream);
+        } finally {
+            stream.close();
         }
     }
 }
