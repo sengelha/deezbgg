@@ -83,6 +83,11 @@ public class ContentProvider extends android.content.ContentProvider {
                         sb.append(DbContract.BoardGameEntry.COLUMN_NAME_YEAR_PUBLISHED);
                         sb.append(" AS ");
                         sb.append(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_YEAR_PUBLISHED);
+                    } else if (column.equals(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_THUMBNAIL_URL)) {
+                        sb.append("BG.");
+                        sb.append(DbContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL);
+                        sb.append(" AS ");
+                        sb.append(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_THUMBNAIL_URL);
                     } else {
                         throw new UnsupportedOperationException("Unhandled column: " + column);
                     }
@@ -129,6 +134,11 @@ public class ContentProvider extends android.content.ContentProvider {
                         sb.append(DbContract.BoardGameEntry.COLUMN_NAME_YEAR_PUBLISHED);
                         sb.append(" AS ");
                         sb.append(ContentContract.BoardGameEntry.COLUMN_NAME_YEAR_PUBLISHED);
+                    } else if (column.equals(ContentContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL)) {
+                        sb.append("BG.");
+                        sb.append(DbContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL);
+                        sb.append(" AS ");
+                        sb.append(ContentContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL);
                     } else {
                         throw new UnsupportedOperationException("Unhandled column: " + column);
                     }
@@ -181,6 +191,8 @@ public class ContentProvider extends android.content.ContentProvider {
                         dbContentValues.put(DbContract.BoardGameEntry.COLUMN_NAME_NAME, (String) e.getValue());
                     } else if (e.getKey().equals(ContentContract.BoardGameEntry.COLUMN_NAME_YEAR_PUBLISHED)) {
                         dbContentValues.put(DbContract.BoardGameEntry.COLUMN_NAME_YEAR_PUBLISHED, (Integer) e.getValue());
+                    } else if (e.getKey().equals(ContentContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL)) {
+                        dbContentValues.put(DbContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL, (String) e.getValue());
                     } else {
                         throw new UnsupportedOperationException("Unhandled key: " + e.getKey());
                     }
@@ -262,7 +274,10 @@ public class ContentProvider extends android.content.ContentProvider {
                     } else if (e.getKey().equals(ContentContract.BoardGameEntry.COLUMN_NAME_NAME)) {
                         dbContentValues.put(DbContract.BoardGameEntry.COLUMN_NAME_NAME, (String) e.getValue());
                     } else if (e.getKey().equals(ContentContract.BoardGameEntry.COLUMN_NAME_YEAR_PUBLISHED)) {
-                        dbContentValues.put(DbContract.BoardGameEntry.COLUMN_NAME_YEAR_PUBLISHED, (String) e.getValue());
+                        dbContentValues.put(DbContract.BoardGameEntry.COLUMN_NAME_YEAR_PUBLISHED, (Integer) e.getValue());
+                    } else if (e.getKey().equals(ContentContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL)) {
+                        Log.i(TAG, "Setting thumbnail url to: " + e.getValue());
+                        dbContentValues.put(DbContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL, (String) e.getValue());
                     } else {
                         throw new UnsupportedOperationException("Unhandled key: " + e.getKey());
                     }

@@ -47,7 +47,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.i(TAG, "Beginning network synchronization");
 
         try {
-            List<Pair<CollectionItem, BoardGame>> collection = BoardGameGeekApi.getCollectionForUser("aldie");
+            List<Pair<CollectionItem, BoardGame>> collection = BoardGameGeekApi.getCollectionForUser("sengelha");
 
             ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
             batch.addAll(getBoardGameUpdates(collection, syncResult));
@@ -96,34 +96,44 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             boardGameMap.put(e.second.id, e.second);
         }
 
+        String[] projection = new String[] {
+                ContentContract.BoardGameEntry._ID,
+                ContentContract.BoardGameEntry.COLUMN_NAME_NAME,
+                ContentContract.BoardGameEntry.COLUMN_NAME_YEAR_PUBLISHED,
+                ContentContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL,
+        };
+
         ContentResolver contentResolver = getContext().getContentResolver();
         Cursor c = contentResolver.query(
                 ContentContract.BoardGameEntry.CONTENT_URI,
-                new String[] { ContentContract.BoardGameEntry._ID, ContentContract.BoardGameEntry.COLUMN_NAME_NAME, ContentContract.BoardGameEntry.COLUMN_NAME_YEAR_PUBLISHED },
+                projection,
                 null,
                 null,
                 null);
         while (c.moveToNext()) {
             syncResult.stats.numEntries++;
 
-            long id = c.getLong(0);
-            String name = c.getString(1);
-            int yearPublished = c.getInt(2);
+            long localId = c.getLong(0);
+            String localName = c.getString(1);
+            int localYearPublished = c.getInt(2);
+            String localThumbnailUrl = c.getString(3);
 
-            BoardGame match = boardGameMap.get(id);
-            if (match != null) {
-                boardGameMap.remove(id);
+            BoardGame remoteBoardGame = boardGameMap.get(localId);
+            if (remoteBoardGame != null) {
+                boardGameMap.remove(localId);
 
                 Uri existingUri = ContentContract.BoardGameEntry.CONTENT_URI
                         .buildUpon()
-                        .appendPath(Long.toString(id))
+                        .appendPath(Long.toString(localId))
                         .build();
-                if (!StringUtils.areEqualOrBothNull(match.name, name) ||
-                    match.yearPublished != yearPublished) {
+                if (!StringUtils.areEqualOrBothNull(remoteBoardGame.name, localName) ||
+                    remoteBoardGame.yearPublished != localYearPublished ||
+                    !StringUtils.areEqualOrBothNull(remoteBoardGame.thumbnailUrl, localThumbnailUrl)) {
                     Log.i(TAG, "Scheduling update: " + existingUri);
                     batch.add(ContentProviderOperation.newUpdate(existingUri)
-                            .withValue(ContentContract.BoardGameEntry.COLUMN_NAME_NAME, name)
-                            .withValue(ContentContract.BoardGameEntry.COLUMN_NAME_YEAR_PUBLISHED, yearPublished)
+                            .withValue(ContentContract.BoardGameEntry.COLUMN_NAME_NAME, remoteBoardGame.name)
+                            .withValue(ContentContract.BoardGameEntry.COLUMN_NAME_YEAR_PUBLISHED, remoteBoardGame.yearPublished)
+                            .withValue(ContentContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL, remoteBoardGame.thumbnailUrl)
                             .build());
                     syncResult.stats.numUpdates++;
                 } else {
@@ -132,7 +142,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             } else {
                 Uri deleteUri = ContentContract.BoardGameEntry.CONTENT_URI
                         .buildUpon()
-                        .appendPath(Long.toString(id))
+                        .appendPath(Long.toString(localId))
                         .build();
                 Log.i(TAG, "Scheduling delete: " + deleteUri);
                 batch.add(ContentProviderOperation.newDelete(deleteUri).build());
@@ -147,6 +157,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     .withValue(ContentContract.BoardGameEntry._ID, boardGame.id)
                     .withValue(ContentContract.BoardGameEntry.COLUMN_NAME_NAME, boardGame.name)
                     .withValue(ContentContract.BoardGameEntry.COLUMN_NAME_YEAR_PUBLISHED, boardGame.yearPublished)
+                    .withValue(ContentContract.BoardGameEntry.COLUMN_NAME_THUMBNAIL_URL, boardGame.thumbnailUrl)
                     .build());
             syncResult.stats.numInserts++;
         }
@@ -162,31 +173,36 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             collectionItemMap.put(e.first.id, e.first);
         }
 
+        String[] projection = new String[] {
+            ContentContract.CollectionItemEntry._ID,
+            ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_ID
+        };
+
         ContentResolver contentResolver = getContext().getContentResolver();
         Cursor c = contentResolver.query(
                 ContentContract.CollectionItemEntry.CONTENT_URI,
-                new String[] { ContentContract.CollectionItemEntry._ID, ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_ID },
+                projection,
                 null,
                 null,
                 null);
         while (c.moveToNext()) {
             syncResult.stats.numEntries++;
 
-            long id = c.getLong(0);
-            long boardGameId = c.getLong(1);
+            long localId = c.getLong(0);
+            long localBoardGameId = c.getLong(1);
 
-            CollectionItem match = collectionItemMap.get(id);
-            if (match != null) {
-                collectionItemMap.remove(id);
+            CollectionItem remoteCollectionItem = collectionItemMap.get(localId);
+            if (remoteCollectionItem != null) {
+                collectionItemMap.remove(localId);
 
                 Uri existingUri = ContentContract.CollectionItemEntry.CONTENT_URI
                         .buildUpon()
-                        .appendPath(Long.toString(id))
+                        .appendPath(Long.toString(localId))
                         .build();
-                if (match.boardGameId != boardGameId) {
+                if (remoteCollectionItem.boardGameId != localBoardGameId) {
                     Log.i(TAG, "Scheduling update: " + existingUri);
                     batch.add(ContentProviderOperation.newUpdate(existingUri)
-                        .withValue(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_ID, boardGameId)
+                        .withValue(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_ID, remoteCollectionItem.boardGameId)
                         .build());
                     syncResult.stats.numUpdates++;
                 } else {
@@ -195,7 +211,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             } else {
                 Uri deleteUri = ContentContract.CollectionItemEntry.CONTENT_URI
                         .buildUpon()
-                        .appendPath(Long.toString(id))
+                        .appendPath(Long.toString(localId))
                         .build();
                 Log.i(TAG, "Scheduling delete: " + deleteUri);
                 batch.add(ContentProviderOperation.newDelete(deleteUri).build());

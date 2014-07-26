@@ -93,7 +93,7 @@ public class BoardGameGeekXmlParser {
             if (name.equals("name")) {
                 boardGame.name = readName(parser);
             } else if (name.equals("thumbnail")) {
-                boardGame.thumbnailUrl = readThumbnail(parser);
+                boardGame.thumbnailUrl = readThumbnailUrl(parser);
             } else if (name.equals("yearpublished")) {
                 boardGame.yearPublished = readYearPublished(parser);
             } else {
@@ -146,11 +146,12 @@ public class BoardGameGeekXmlParser {
         return name;
     }
 
-    private URL readThumbnail(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private String readThumbnailUrl(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, "thumbnail");
-        String thumbnail = readText(parser);
+        String thumbnailUrl = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, "thumbnail");
-        return new URL(thumbnail);
+        Log.i(TAG, "Read thumbnail url: " + thumbnailUrl);
+        return thumbnailUrl;
     }
 
     private int readYearPublished(XmlPullParser parser) throws XmlPullParserException, IOException {

@@ -8,7 +8,6 @@ import java.net.URL;
 public class BoardGame {
     public long id;
     public String name;
-    public URL thumbnailUrl;
-    public URL imageUrl;
+    public String thumbnailUrl;
     public int yearPublished;
 }

@@ -17,6 +17,7 @@ public class ContentContract {
         // Use _ID for the board game id
         public static final String COLUMN_NAME_NAME = "name";
         public static final String COLUMN_NAME_YEAR_PUBLISHED = "yearPublished";
+        public static final String COLUMN_NAME_THUMBNAIL_URL = "thumbnailUrl";
     }
 
     public static abstract class CollectionItemEntry implements BaseColumns {
@@ -26,6 +27,7 @@ public class ContentContract {
         public static final String COLUMN_NAME_BOARD_GAME_ID = "boardGameId";
         public static final String COLUMN_NAME_BOARD_GAME_NAME = "boardGameName";
         public static final String COLUMN_NAME_BOARD_GAME_YEAR_PUBLISHED = "boardGameYearPublished";
+        public static final String COLUMN_NAME_BOARD_GAME_THUMBNAIL_URL = "boardGameThumbnailUrl";
     }
 
     public static abstract class PlayEntry implements BaseColumns {
