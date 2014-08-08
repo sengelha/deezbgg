@@ -1,0 +1,15 @@
+TODO:
+- Change from tab-based screen switch to dropdown menu switch
+- Have refresh button show 'refreshing' spinner when we're actually processing the refreshes
+- If we cannot load a board game image, load a "not found" image instead
+- Scrolling reuses ImageViews.  Change the code to handle this properly.
+- Refactor BoardGameGeekXmlParser
+  - Eliminate entity/ directory entirely.
+- When loading plays from the BGG API, also load the individual board games
+  - What about collection?
+- Change image caching to persist to disk.
+- Allow choosing someone else's collection to view
+  - Database schema should store each person's collection separately
+- Add "The Hotness" screen
+- Add ability to click on a game to view details
+- Add ability to log play via UI

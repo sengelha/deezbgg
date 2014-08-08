@@ -19,7 +19,6 @@ import info.deez.deezbgg.accounts.AccountUtils;
 import info.deez.deezbgg.bitmap.BitmapMemoryCache;
 import info.deez.deezbgg.content.ContentContract;
 import info.deez.deezbgg.sync.SyncUtils;
-import info.deez.deezbgg.ui.fragment.plays.PlaysFragmentAdapter;
 
 public class PlaysFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "PlaysFragment";
