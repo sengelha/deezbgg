@@ -1,5 +1,6 @@
 TODO:
-- Change from tab-based screen switch to dropdown menu switch
+- Fix refresh button so that it actually refreshes instead of crashing
+- Fix display of tab drawer to be more like mail app
 - Have refresh button show 'refreshing' spinner when we're actually processing the refreshes
 - If we cannot load a board game image, load a "not found" image instead
 - Scrolling reuses ImageViews.  Change the code to handle this properly.
@@ -13,3 +14,6 @@ TODO:
 - Add "The Hotness" screen
 - Add ability to click on a game to view details
 - Add ability to log play via UI
+- Give deezbgg better iconography, including:
+  - App icon
+  - Pull out drawer
