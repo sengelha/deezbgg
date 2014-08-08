@@ -1,5 +1,5 @@
 TODO:
-- Scrolling reuses ImageViews.  Change the code to handle this properly.
+- Add rating to collection UI
 - Refactor BoardGameGeekXmlParser
   - Eliminate entity/ directory entirely.
 - When loading plays from the BGG API, also load the individual board games
