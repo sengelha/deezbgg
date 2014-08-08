@@ -73,6 +73,8 @@ public class PlaysFragmentAdapter extends CursorAdapter {
                 holder.thumbnail.setImageDrawable(asyncDrawable);
                 task.execute(thumbnailUrl);
             }
+        } else {
+            holder.thumbnail.setImageResource(R.drawable.no_image_available);
         }
         holder.boardGameName.setText(cursor.getString(cursor.getColumnIndex(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_NAME)));
         holder.playDate.setText(cursor.getString(cursor.getColumnIndex(ContentContract.PlayEntry.COLUMN_NAME_PLAY_DATE)));
