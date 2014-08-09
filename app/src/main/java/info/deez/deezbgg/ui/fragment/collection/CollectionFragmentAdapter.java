@@ -62,7 +62,9 @@ public class CollectionFragmentAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         Log.i(TAG, "In CollectionFragmentAdapter.bindView()");
 
+        String boardGameName = cursor.getString(cursor.getColumnIndex(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_NAME));
         String thumbnailUrl = cursor.getString(cursor.getColumnIndex(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_THUMBNAIL_URL));
+        String yearPublished = cursor.getString(cursor.getColumnIndex(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_YEAR_PUBLISHED));
 
         ViewHolder holder = (ViewHolder) view.getTag();
 
@@ -73,9 +75,11 @@ public class CollectionFragmentAdapter extends CursorAdapter {
                 holder.thumbnail.setImageDrawable(asyncDrawable);
                 task.execute(thumbnailUrl);
             }
+        } else {
+            holder.thumbnail.setImageResource(R.drawable.no_image_available);
         }
-        holder.boardGameName.setText(cursor.getString(cursor.getColumnIndex(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_NAME)));
-        holder.boardGameYearPublished.setText(cursor.getString(cursor.getColumnIndex(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_YEAR_PUBLISHED)));
+        holder.boardGameName.setText(boardGameName != null ? boardGameName : context.getString(R.string.unknown));
+        holder.boardGameYearPublished.setText(yearPublished != null ? yearPublished : context.getString(R.string.unknown));
     }
 
     private boolean cancelPotentialWork(String url, ImageView imageView) {

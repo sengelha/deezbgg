@@ -6,7 +6,7 @@ public class DbContract {
     private DbContract() {}
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 8;
+    public static final int DATABASE_VERSION = 9;
 
     /* Inner class that defines the table contents */
     public static abstract class BoardGameEntry implements BaseColumns {
@@ -23,6 +23,7 @@ public class DbContract {
         public static final String TABLE_NAME = "collectionItem";
         // Use _ID for collectionItemId
         public static final String COLUMN_NAME_BOARD_GAME_ID = "boardGameId";
+        public static final String COLUMN_NAME_OWNED = "owned";
     }
 
     /* Inner class that defines the table contents */
@@ -48,6 +49,7 @@ public class DbContract {
             "CREATE TABLE " + CollectionItemEntry.TABLE_NAME + "("
                     + CollectionItemEntry._ID + " INTEGER PRIMARY KEY"
                     + "," + CollectionItemEntry.COLUMN_NAME_BOARD_GAME_ID + " INTEGER"
+                    + "," + CollectionItemEntry.COLUMN_NAME_OWNED + " BIT"
                     + ")";
     public static final String SQL_DROP_COLLECTION_ITEMS =
             "DROP TABLE IF EXISTS " + CollectionItemEntry.TABLE_NAME;

@@ -1,19 +1,17 @@
 TODO:
-- Add rating to collection UI
-- Refactor BoardGameGeekXmlParser
-  - Eliminate entity/ directory entirely.
-- When loading plays from the BGG API, also load the individual board games
-  - What about collection?
+- If we can't find the board game, replace the title with the identifier number
+- Add getGames to BGG API, add it to syncadapter, get rid of garbage sync-from-collection and
+  sync-from-plays code
+- Have refresh button show 'refreshing' spinner when we're actually processing the refreshes
+- Add rating to collection list UI
+- Add "The Hotness" screen
+- Add ability to click on a game to view details
 - Change image caching to persist to disk.
 - Allow choosing someone else's collection to view
   - Database schema should store each person's collection separately
-- Add "The Hotness" screen
-- Add ability to click on a game to view details
 - Add ability to log play via UI
-- Have refresh button show 'refreshing' spinner when we're actually processing the refreshes
-- Fix refresh button so that it actually refreshes instead of crashing
-- Fix display of tab drawer to be more like mail app
-- Move loading no image available off of UI thread?
+- Add "no games found" to collection, plays, etc. (for before sync)
+- Move loading 'no image available' resource off of UI thread?
 - Give deezbgg better iconography, including:
   - App icon
   - Pull out drawer

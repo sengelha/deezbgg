@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Set;
 
 import info.deez.deezbgg.content.ContentContract;
-import info.deez.deezbgg.entity.BoardGame;
-import info.deez.deezbgg.entity.CollectionItem;
-import info.deez.deezbgg.entity.Play;
+import info.deez.deezbgg.sync.bggapi.BoardGameGeekApi;
+import info.deez.deezbgg.sync.bggapi.CollectionItem;
+import info.deez.deezbgg.sync.bggapi.Play;
 import info.deez.deezbgg.utils.StringUtils;
 
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
@@ -51,29 +51,30 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.i(TAG, "Beginning network synchronization");
 
         try {
-            List<Pair<CollectionItem, BoardGame>> collection = BoardGameGeekApi.getCollectionForUser("sengelha");
-            List<Pair<Play, BoardGame>> plays = BoardGameGeekApi.getPlaysForUser("sengelha");
+            List<CollectionItem> collection = BoardGameGeekApi.getCollectionForUser("sengelha");
+            List<Play> plays = BoardGameGeekApi.getPlaysForUser("sengelha");
+            // Pull out board game ids from collection and plays, get those from BGGAPI
 
             ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
-            Set<BoardGame> boardGames = new HashSet<BoardGame>();
-            for (Pair<CollectionItem, BoardGame> e : collection) {
-                boardGames.add(e.second);
-            }
-            for (Pair<Play, BoardGame> e : plays) {
-                boardGames.add(e.second);
-            }
-            batch.addAll(getBoardGameUpdates(boardGames, syncResult));
+            batch.addAll(getBoardGameUpdatesFromCollection(collection, syncResult));
             batch.addAll(getCollectionUpdates(collection, syncResult));
+            batch.addAll(getBoardGameUpdatesFromPlays(plays, syncResult));
             batch.addAll(getPlayUpdates(plays, syncResult));
 
             Log.i(TAG, "Merge solution ready.  Applying batch update");
             mContentResolver.applyBatch(ContentContract.CONTENT_AUTHORITY, batch);
+
+            Log.i(TAG, "Notifying callers of changes");
             mContentResolver.notifyChange(
                     ContentContract.BoardGameEntry.CONTENT_URI,
                     null,
                     false);
             mContentResolver.notifyChange(
                     ContentContract.CollectionItemEntry.CONTENT_URI,
+                    null,
+                    false);
+            mContentResolver.notifyChange(
+                    ContentContract.PlayEntry.CONTENT_URI,
                     null,
                     false);
         } catch (MalformedURLException e) {
@@ -101,12 +102,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.i(TAG, "Network synchronization complete");
     }
 
-    private List<ContentProviderOperation> getBoardGameUpdates(Collection<BoardGame> boardGames, SyncResult syncResult) throws RemoteException, OperationApplicationException {
+    private List<ContentProviderOperation> getBoardGameUpdatesFromCollection(Collection<CollectionItem> collectionItems, SyncResult syncResult) throws RemoteException, OperationApplicationException {
         List<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
 
-        HashMap<Long, BoardGame> boardGameMap = new HashMap<Long, BoardGame>();
-        for (BoardGame boardGame : boardGames) {
-            boardGameMap.put(boardGame.id, boardGame);
+        HashMap<Long, CollectionItem.BoardGame> boardGameMap = new HashMap<Long, CollectionItem.BoardGame>();
+        for (CollectionItem collectionItem : collectionItems) {
+            boardGameMap.put(collectionItem.boardGame.id, collectionItem.boardGame);
         }
 
         String[] projection = new String[] {
@@ -131,7 +132,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             int localYearPublished = c.getInt(2);
             String localThumbnailUrl = c.getString(3);
 
-            BoardGame remoteBoardGame = boardGameMap.get(localId);
+            CollectionItem.BoardGame remoteBoardGame = boardGameMap.get(localId);
             if (remoteBoardGame != null) {
                 boardGameMap.remove(localId);
 
@@ -155,20 +156,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 } else {
                     Log.i(TAG, "No action: " + existingUri);
                 }
-            } else {
-                Uri deleteUri = ContentContract.BoardGameEntry.CONTENT_URI
-                        .buildUpon()
-                        .appendPath(Long.toString(localId))
-                        .build();
-                Log.i(TAG, "Scheduling delete: " + deleteUri);
-                batch.add(ContentProviderOperation.newDelete(deleteUri).build());
-                syncResult.stats.numDeletes++;
             }
+            // Don't delete the board game if it isn't referenced in the collection
         }
         c.close();
 
-        for (BoardGame boardGame : boardGameMap.values()) {
-            Log.i(TAG, "Scheduling insert: id=" + boardGame.id);
+        for (CollectionItem.BoardGame boardGame : boardGameMap.values()) {
+            Log.i(TAG, "Scheduling insert of board game: id=" + boardGame.id + ", name=" + boardGame.name);
 
             ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(ContentContract.BoardGameEntry.CONTENT_URI)
                     .withValue(ContentContract.BoardGameEntry._ID, boardGame.id)
@@ -185,12 +179,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         return batch;
     }
 
-    private List<ContentProviderOperation> getCollectionUpdates(List<Pair<CollectionItem, BoardGame>> collectionItems, SyncResult syncResult) throws RemoteException, OperationApplicationException {
+    private List<ContentProviderOperation> getCollectionUpdates(List<CollectionItem> collectionItems, SyncResult syncResult) throws RemoteException, OperationApplicationException {
         List<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
 
         HashMap<Long, CollectionItem> collectionItemMap = new HashMap<Long, CollectionItem>();
-        for (Pair<CollectionItem, BoardGame> e : collectionItems) {
-            collectionItemMap.put(e.first.id, e.first);
+        for (CollectionItem collectionItem : collectionItems) {
+            collectionItemMap.put(collectionItem.id, collectionItem);
         }
 
         String[] projection = new String[] {
@@ -219,10 +213,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                         .buildUpon()
                         .appendPath(Long.toString(localId))
                         .build();
-                if (remoteCollectionItem.boardGameId != localBoardGameId) {
+                if (remoteCollectionItem.boardGame.id != localBoardGameId) {
                     Log.i(TAG, "Scheduling update: " + existingUri);
                     batch.add(ContentProviderOperation.newUpdate(existingUri)
-                        .withValue(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_ID, remoteCollectionItem.boardGameId)
+                        .withValue(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_ID, remoteCollectionItem.boardGame.id)
                         .build());
                     syncResult.stats.numUpdates++;
                 } else {
@@ -244,7 +238,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             Log.i(TAG, "Scheduling insert: id=" + collectionItem.id);
             batch.add(ContentProviderOperation.newInsert(ContentContract.CollectionItemEntry.CONTENT_URI)
                     .withValue(ContentContract.CollectionItemEntry._ID, collectionItem.id)
-                    .withValue(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_ID, collectionItem.boardGameId)
+                    .withValue(ContentContract.CollectionItemEntry.COLUMN_NAME_BOARD_GAME_ID, collectionItem.boardGame.id)
                     .build());
             syncResult.stats.numInserts++;
         }
@@ -252,12 +246,75 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         return batch;
     }
 
-    private List<ContentProviderOperation> getPlayUpdates(List<Pair<Play, BoardGame>> plays, SyncResult syncResult) throws RemoteException, OperationApplicationException {
+    private List<ContentProviderOperation> getBoardGameUpdatesFromPlays(Collection<Play> plays, SyncResult syncResult) throws RemoteException, OperationApplicationException {
+        List<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
+
+        HashMap<Long, Play.BoardGame> boardGameMap = new HashMap<Long, Play.BoardGame>();
+        for (Play play : plays) {
+            boardGameMap.put(play.boardGame.id, play.boardGame);
+        }
+
+        String[] projection = new String[] {
+                ContentContract.BoardGameEntry._ID,
+                ContentContract.BoardGameEntry.COLUMN_NAME_NAME
+        };
+
+        ContentResolver contentResolver = getContext().getContentResolver();
+        Cursor c = contentResolver.query(
+                ContentContract.BoardGameEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+        while (c.moveToNext()) {
+            syncResult.stats.numEntries++;
+
+            long localId = c.getLong(0);
+            String localName = c.getString(1);
+
+            Play.BoardGame remoteBoardGame = boardGameMap.get(localId);
+            if (remoteBoardGame != null) {
+                boardGameMap.remove(localId);
+
+                Uri existingUri = ContentContract.BoardGameEntry.CONTENT_URI
+                        .buildUpon()
+                        .appendPath(Long.toString(localId))
+                        .build();
+                if (!StringUtils.areEqualOrBothNull(remoteBoardGame.name, localName)) {
+                    Log.i(TAG, "Scheduling update: " + existingUri);
+
+                    ContentProviderOperation.Builder builder = ContentProviderOperation.newUpdate(existingUri)
+                            .withValue(ContentContract.BoardGameEntry.COLUMN_NAME_NAME, remoteBoardGame.name);
+                    batch.add(builder.build());
+                    syncResult.stats.numUpdates++;
+                } else {
+                    Log.i(TAG, "No action: " + existingUri);
+                }
+            }
+            // Don't delete the board game if it isn't referenced in the collection
+        }
+        c.close();
+
+        for (Play.BoardGame boardGame : boardGameMap.values()) {
+            Log.i(TAG, "Scheduling insert of board game: id=" + boardGame.id + ", name=" + boardGame.name);
+
+            ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(ContentContract.BoardGameEntry.CONTENT_URI)
+                    .withValue(ContentContract.BoardGameEntry._ID, boardGame.id)
+                    .withValue(ContentContract.BoardGameEntry.COLUMN_NAME_NAME, boardGame.name);
+            batch.add(builder.build());
+
+            syncResult.stats.numInserts++;
+        }
+
+        return batch;
+    }
+
+    private List<ContentProviderOperation> getPlayUpdates(List<Play> plays, SyncResult syncResult) throws RemoteException, OperationApplicationException {
         List<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
 
         HashMap<Long, Play> playMap = new HashMap<Long, Play>();
-        for (Pair<Play, BoardGame> e : plays) {
-            playMap.put(e.first.id, e.first);
+        for (Play play : plays) {
+            playMap.put(play.id, play);
         }
 
         String[] projection = new String[] {
@@ -288,11 +345,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                         .buildUpon()
                         .appendPath(Long.toString(localId))
                         .build();
-                if (remotePlay.boardGameId != localBoardGameId ||
+                if (remotePlay.boardGame.id != localBoardGameId ||
                     !StringUtils.areEqualOrBothNull(remotePlay.date, localPlayDate)) {
                     Log.i(TAG, "Scheduling update: " + existingUri);
                     batch.add(ContentProviderOperation.newUpdate(existingUri)
-                            .withValue(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_ID, remotePlay.boardGameId)
+                            .withValue(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_ID, remotePlay.boardGame.id)
                             .withValue(ContentContract.PlayEntry.COLUMN_NAME_PLAY_DATE, remotePlay.date)
                             .build());
                     syncResult.stats.numUpdates++;
@@ -315,7 +372,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             Log.i(TAG, "Scheduling insert: id=" + play.id);
             batch.add(ContentProviderOperation.newInsert(ContentContract.PlayEntry.CONTENT_URI)
                     .withValue(ContentContract.PlayEntry._ID, play.id)
-                    .withValue(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_ID, play.boardGameId)
+                    .withValue(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_ID, play.boardGame.id)
                     .withValue(ContentContract.PlayEntry.COLUMN_NAME_PLAY_DATE, play.date)
                     .build());
             syncResult.stats.numInserts++;

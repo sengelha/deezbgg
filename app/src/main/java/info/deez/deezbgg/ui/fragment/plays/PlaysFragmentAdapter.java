@@ -62,7 +62,9 @@ public class PlaysFragmentAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         Log.i(TAG, "In PlaysFragmentAdapter.bindView()");
 
+        String boardGameName = cursor.getString(cursor.getColumnIndex(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_NAME));
         String thumbnailUrl = cursor.getString(cursor.getColumnIndex(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_THUMBNAIL_URL));
+        String playDate = cursor.getString(cursor.getColumnIndex(ContentContract.PlayEntry.COLUMN_NAME_PLAY_DATE));
 
         ViewHolder holder = (ViewHolder) view.getTag();
 
@@ -76,8 +78,8 @@ public class PlaysFragmentAdapter extends CursorAdapter {
         } else {
             holder.thumbnail.setImageResource(R.drawable.no_image_available);
         }
-        holder.boardGameName.setText(cursor.getString(cursor.getColumnIndex(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_NAME)));
-        holder.playDate.setText(cursor.getString(cursor.getColumnIndex(ContentContract.PlayEntry.COLUMN_NAME_PLAY_DATE)));
+        holder.boardGameName.setText(boardGameName != null ? boardGameName : context.getString(R.string.unknown));
+        holder.playDate.setText(playDate != null ? playDate : context.getString(R.string.unknown));
     }
 
     private boolean cancelPotentialWork(String url, ImageView imageView) {

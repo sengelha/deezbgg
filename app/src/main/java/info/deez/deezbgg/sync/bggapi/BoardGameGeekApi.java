@@ -1,4 +1,4 @@
-package info.deez.deezbgg.sync;
+package info.deez.deezbgg.sync.bggapi;
 
 import android.util.Pair;
 
@@ -6,26 +6,17 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.List;
 
-import info.deez.deezbgg.entity.BoardGame;
-import info.deez.deezbgg.entity.CollectionItem;
-import info.deez.deezbgg.entity.Play;
-
-/**
- * Created by sengelha on 7/22/2014.
- */
 public class BoardGameGeekApi {
-    public static List<Pair<CollectionItem, BoardGame>> getCollectionForUser(String username) throws IOException, XmlPullParserException {
+    public static List<CollectionItem> getCollectionForUser(String username) throws IOException, XmlPullParserException {
         URL url = new URL("http://boardgamegeek.com/xmlapi2/collection?username=" + username);
         URLConnection conn = url.openConnection();
-        BoardGameGeekXmlParser parser = new BoardGameGeekXmlParser();
+        CollectionXmlParser parser = new CollectionXmlParser();
 
-        List<Pair<CollectionItem, BoardGame>> apiResults;
+        List<CollectionItem> apiResults;
         InputStream stream = conn.getInputStream();
         try {
             apiResults = parser.parseCollection(stream);
@@ -36,12 +27,12 @@ public class BoardGameGeekApi {
         return apiResults;
     }
 
-    public static List<Pair<Play, BoardGame>> getPlaysForUser(String username) throws IOException, XmlPullParserException {
+    public static List<Play> getPlaysForUser(String username) throws IOException, XmlPullParserException {
         URL url = new URL("http://boardgamegeek.com/xmlapi2/plays?username=" + username);
         URLConnection conn = url.openConnection();
-        BoardGameGeekXmlParser parser = new BoardGameGeekXmlParser();
+        PlayXmlParser parser = new PlayXmlParser();
 
-        List<Pair<Play, BoardGame>> apiResults;
+        List<Play> apiResults;
         InputStream stream = conn.getInputStream();
         try {
             apiResults = parser.parsePlays(stream);

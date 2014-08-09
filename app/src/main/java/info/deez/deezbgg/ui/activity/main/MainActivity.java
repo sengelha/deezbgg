@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import info.deez.deezbgg.R;
+import info.deez.deezbgg.sync.SyncUtils;
 import info.deez.deezbgg.ui.fragment.collection.CollectionFragment;
 import info.deez.deezbgg.ui.fragment.plays.PlaysFragment;
 
@@ -84,6 +85,7 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // TODO: Should we defer button creation to the hosted fragments somehow?
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
@@ -105,13 +107,12 @@ public class MainActivity extends Activity {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        // Handle action buttons
-        switch(item.getItemId()) {
-            case R.id.action_refresh:
-                throw new RuntimeException("Not implemented");
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+
+        // This is where we would handle buttons that are global to all screens.
+
+        // Hosted fragments that override onOptionsItemSelected() will handle
+        // their buttons.
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
