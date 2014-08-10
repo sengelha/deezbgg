@@ -1,5 +1,4 @@
 TODO:
-- If we can't find the board game, replace the title with the identifier number
 - Add getGames to BGG API, add it to syncadapter, get rid of garbage sync-from-collection and
   sync-from-plays code
 - Have refresh button show 'refreshing' spinner when we're actually processing the refreshes

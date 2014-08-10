@@ -28,6 +28,7 @@ public class PlaysFragmentAdapter extends CursorAdapter {
 
     public static final String[] COLUMNS = {
             ContentContract.PlayEntry._ID,
+            ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_ID,
             ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_NAME,
             ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_THUMBNAIL_URL,
             ContentContract.PlayEntry.COLUMN_NAME_PLAY_DATE,
@@ -62,6 +63,7 @@ public class PlaysFragmentAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         Log.i(TAG, "In PlaysFragmentAdapter.bindView()");
 
+        long boardGameId = cursor.getLong(cursor.getColumnIndex(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_ID));
         String boardGameName = cursor.getString(cursor.getColumnIndex(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_NAME));
         String thumbnailUrl = cursor.getString(cursor.getColumnIndex(ContentContract.PlayEntry.COLUMN_NAME_BOARD_GAME_THUMBNAIL_URL));
         String playDate = cursor.getString(cursor.getColumnIndex(ContentContract.PlayEntry.COLUMN_NAME_PLAY_DATE));
@@ -78,7 +80,7 @@ public class PlaysFragmentAdapter extends CursorAdapter {
         } else {
             holder.thumbnail.setImageResource(R.drawable.no_image_available);
         }
-        holder.boardGameName.setText(boardGameName != null ? boardGameName : context.getString(R.string.unknown));
+        holder.boardGameName.setText(boardGameName != null ? boardGameName : Long.toString(boardGameId));
         holder.playDate.setText(playDate != null ? playDate : context.getString(R.string.unknown));
     }
 
