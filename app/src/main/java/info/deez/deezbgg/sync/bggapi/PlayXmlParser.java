@@ -63,8 +63,8 @@ public class PlayXmlParser {
             }
             String name = parser.getName();
             if (name.equals("item")) {
-                play.boardGame.id = Long.parseLong(parser.getAttributeValue(null, "objectid"));
-                play.boardGame.name = parser.getAttributeValue(null, "name");
+                play.boardGameId = Long.parseLong(parser.getAttributeValue(null, "objectid"));
+                play.boardGameName = parser.getAttributeValue(null, "name");
                 XmlParserUtils.skip(parser);
                 parser.require(XmlPullParser.END_TAG, ns, "item");
             } else {

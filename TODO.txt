@@ -1,6 +1,6 @@
 TODO:
-- Add getGames to BGG API, add it to syncadapter, get rid of garbage sync-from-collection and
-  sync-from-plays code
+- Fix notification of syncadapter of changes so that screen will refresh properly
+- Add and show BGG rating on board game screen
 - Have refresh button show 'refreshing' spinner when we're actually processing the refreshes
 - Add rating to collection list UI
 - Add "The Hotness" screen
@@ -9,6 +9,9 @@ TODO:
 - Allow choosing someone else's collection to view
   - Database schema should store each person's collection separately
 - Add ability to log play via UI
+- Don't sync games that have synched recently (???)
+
+Cleanup:
 - Add "no games found" to collection, plays, etc. (for before sync)
 - Move loading 'no image available' resource off of UI thread?
 - Give deezbgg better iconography, including:

@@ -51,7 +51,7 @@ public class CollectionXmlParser {
 
         CollectionItem collectionItem = new CollectionItem();
         collectionItem.id = Long.parseLong(parser.getAttributeValue(null, "collid"));
-        collectionItem.boardGame.id = Long.parseLong(parser.getAttributeValue(null, "objectid"));
+        collectionItem.boardGameId = Long.parseLong(parser.getAttributeValue(null, "objectid"));
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -59,13 +59,13 @@ public class CollectionXmlParser {
             }
             String name = parser.getName();
             if (name.equals("name")) {
-                collectionItem.boardGame.name = XmlParserUtils.readInnerText(parser);
+                collectionItem.boardGameName = XmlParserUtils.readInnerText(parser);
             } else if (name.equals("yearpublished")) {
-                collectionItem.boardGame.setYearPublished(Integer.parseInt(XmlParserUtils.readInnerText(parser)));
+                collectionItem.boardGameYearPublished = new Integer(XmlParserUtils.readInnerText(parser));
             } else if (name.equals("image")) {
-                collectionItem.boardGame.setImageUrl(XmlParserUtils.readInnerText(parser));
+                collectionItem.boardGameImageUrl = XmlParserUtils.readInnerText(parser);
             } else if (name.equals("thumbnail")) {
-                collectionItem.boardGame.setThumbnailUrl(XmlParserUtils.readInnerText(parser));
+                collectionItem.boardGameThumbnailUrl = XmlParserUtils.readInnerText(parser);
             } else if (name.equals("status")) {
                 collectionItem.owned = "1".equals(parser.getAttributeValue(null, "own"));
                 XmlParserUtils.skip(parser);
